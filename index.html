@@ -498,6 +498,329 @@
       transform: translateY(2px);
       box-shadow: 0 1px 0 rgba(15, 23, 42, 0.25);
     }
+
+    /* ================= PUZZLE MODE STYLES ================= */
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: #dbeafe;
+      border: 2.5px solid #1e293b;
+      border-radius: var(--radius-md);
+      padding: 3px;
+    }
+
+    .mode-tab {
+      border: 2px solid transparent;
+      border-radius: 9px;
+      padding: 5px 4px;
+      font-size: 0.84rem;
+      font-weight: 900;
+      color: #334155;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.14s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .mode-tab.active {
+      background: #ffffff;
+      color: #0f172a;
+      border-color: #1e293b;
+      box-shadow: 0 2px 0 rgba(15, 23, 42, 0.18);
+    }
+
+    .mode-tab[data-mode="puzzle"].active {
+      background: linear-gradient(135deg, #fef08a, #facc15);
+      color: #0f172a;
+    }
+
+    .puzzle-panel {
+      display: none;
+      background: linear-gradient(180deg, #fffbeb, #fef3c7);
+      border: 2.5px solid #f59e0b;
+      border-radius: var(--radius-lg);
+      padding: 6px 8px;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    body.mode-puzzle .puzzle-panel {
+      display: flex;
+    }
+
+    body.mode-puzzle #presetSection {
+      display: none;
+    }
+
+    body.mode-puzzle .sidebar-pane {
+      gap: 5px;
+      padding: 6px 10px;
+    }
+
+    body.mode-puzzle .op-btn {
+      min-height: 36px;
+      padding: 5px 4px;
+    }
+
+    body.mode-puzzle .hud-number-card {
+      max-width: 33%;
+    }
+
+    body.mode-puzzle .hud-scale-card {
+      min-width: 185px;
+      max-width: 29%;
+    }
+
+    body.mode-puzzle .speech-bubble {
+      top: 132px;
+    }
+
+    .diff-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+    }
+
+    .diff-btn {
+      border: 2px solid #1e293b;
+      border-radius: 9px;
+      padding: 4px 2px;
+      font-size: 0.76rem;
+      font-weight: 900;
+      background: #ffffff;
+      color: #334155;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgba(15, 23, 42, 0.14);
+    }
+
+    .diff-btn.active {
+      background: #f97316;
+      color: #ffffff;
+    }
+
+    .puzzle-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .puzzle-action-btn {
+      border: 2px solid #1e293b;
+      border-radius: 10px;
+      padding: 5px 4px;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgba(15, 23, 42, 0.16);
+    }
+
+    .puzzle-action-btn.new-target {
+      background: #fde047;
+      color: #0f172a;
+    }
+
+    .puzzle-action-btn.hint {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+
+    .puzzle-action-btn:active {
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+
+    @keyframes hintPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 3px #facc15, 0 4px 12px rgba(250, 204, 21, 0.8);
+        transform: scale(1.04);
+      }
+      50% {
+        box-shadow: 0 0 0 6px #f97316, 0 6px 20px rgba(249, 115, 22, 0.95);
+        transform: scale(1.08);
+      }
+    }
+
+    .op-btn.hint-glow {
+      animation: hintPulse 0.7s ease-in-out infinite;
+      z-index: 3;
+      border-color: #fef08a;
+    }
+
+    /* Stage Top Center Target HUD */
+    .hud-puzzle-card {
+      display: none;
+      flex: 0 1 auto;
+      background: rgba(255, 251, 235, 0.96);
+      backdrop-filter: blur(8px);
+      border: 3.5px solid #f59e0b;
+      border-radius: 18px;
+      padding: 7px 16px;
+      box-shadow: 0 5px 0 rgba(180, 83, 9, 0.3), 0 10px 24px rgba(15, 23, 42, 0.2);
+      text-align: center;
+      min-width: 215px;
+      max-width: 35%;
+      pointer-events: auto;
+    }
+
+    body.mode-puzzle .hud-puzzle-card {
+      display: block;
+    }
+
+    .hud-puzzle-card.solved {
+      border-color: #16a34a;
+      background: rgba(240, 253, 244, 0.97);
+      box-shadow: 0 6px 0 rgba(21, 128, 61, 0.3), 0 10px 26px rgba(22, 163, 74, 0.35);
+    }
+
+    .puzzle-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .puzzle-badge-pill {
+      font-size: 0.74rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      background: #f59e0b;
+      color: #ffffff;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1.8px solid #1e293b;
+    }
+
+    .puzzle-stat-chip {
+      font-size: 0.72rem;
+      font-weight: 800;
+      background: #ffffff;
+      color: #1e293b;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1.5px solid #94a3b8;
+    }
+
+    .puzzle-stat-chip.trophy {
+      background: #fef08a;
+      border-color: #ca8a04;
+      color: #713f12;
+    }
+
+    .puzzle-target-num {
+      margin-top: 3px;
+      font-size: clamp(1.3rem, 2.3vw, 2rem);
+      font-weight: 900;
+      color: #b45309;
+      line-height: 1.1;
+      word-break: break-all;
+    }
+
+    .hud-puzzle-card.solved .puzzle-target-num {
+      color: #15803d;
+    }
+
+    .puzzle-target-vn {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #475569;
+      margin-top: 1px;
+    }
+
+    .puzzle-status-pill {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 900;
+      border: 1.8px solid #1e293b;
+    }
+
+    .puzzle-status-pill.up {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .puzzle-status-pill.down {
+      background: #ffe4e6;
+      color: #9f1239;
+    }
+
+    .puzzle-status-pill.match {
+      background: #facc15;
+      color: #0f172a;
+    }
+
+    /* Celebration Win Banner */
+    @keyframes winPop {
+      0% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+      70% { transform: translateX(-50%) scale(1.05); opacity: 1; }
+      100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    }
+
+    .puzzle-win-banner {
+      display: none;
+      position: absolute;
+      top: 124px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #fef08a 0%, #fde047 50%, #fbbf24 100%);
+      border: 3.5px solid #1e293b;
+      border-radius: 22px;
+      padding: 10px 22px;
+      text-align: center;
+      box-shadow: 0 6px 0 #b45309, 0 14px 32px rgba(0, 0, 0, 0.3);
+      z-index: 15;
+      max-width: 82%;
+      animation: winPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .puzzle-win-banner.show {
+      display: block;
+    }
+
+    .puzzle-win-title {
+      font-size: clamp(0.95rem, 1.55vw, 1.24rem);
+      font-weight: 900;
+      color: #991b1b;
+      white-space: nowrap;
+    }
+
+    .puzzle-win-sub {
+      margin-top: 3px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #1e293b;
+    }
+
+    .puzzle-win-btn {
+      margin-top: 8px;
+      border: 2.5px solid #1e293b;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #22c55e, #16a34a);
+      color: #ffffff;
+      padding: 8px 20px;
+      font-size: 0.95rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #14532d;
+      transition: transform 0.08s ease;
+    }
+
+    .puzzle-win-btn:hover {
+      filter: brightness(1.06);
+    }
+
+    .puzzle-win-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #14532d;
+    }
   </style>
 </head>
 <body>
@@ -515,11 +838,28 @@
           <div class="hud-vietnamese" id="hudVietnamese">Một</div>
         </div>
 
+        <div class="hud-puzzle-card" id="puzzleHudCard">
+          <div class="puzzle-meta-row">
+            <span class="puzzle-badge-pill">🎯 Số mục tiêu</span>
+            <span class="puzzle-stat-chip" id="puzzleStepsChip">Bước: 0</span>
+            <span class="puzzle-stat-chip trophy" id="puzzleSolvedChip">🏆 Đã giải: 0</span>
+          </div>
+          <div class="puzzle-target-num" id="puzzleTargetNum">10</div>
+          <div class="puzzle-target-vn" id="puzzleTargetVn">Mười</div>
+          <div class="puzzle-status-pill up" id="puzzleStatusPill">▲ Cần tăng thêm</div>
+        </div>
+
         <div class="hud-scale-card">
           <div class="hud-scene-badge" id="hudSceneBadge">Cấp 1 / 8</div>
           <div class="hud-scale-title" id="hudSceneTitle">Bãi cỏ cận cảnh</div>
           <div class="hud-scale-desc" id="hudSceneCompare">Nhỏ bằng 1 quả cam (~8 cm)</div>
         </div>
+      </div>
+
+      <div class="puzzle-win-banner" id="puzzleWinBanner">
+        <div class="puzzle-win-title">🎉 HOAN HÔ! CHINH PHỤC THÀNH CÔNG! 🎉</div>
+        <div class="puzzle-win-sub" id="puzzleWinSub">Bé đã đạt số 10 sau 2 bước tính!</div>
+        <button class="puzzle-win-btn" id="btnNextPuzzle" type="button">🎯 Câu đố tiếp theo ▶</button>
       </div>
 
       <div class="speech-bubble" id="speechBubble"></div>
@@ -545,6 +885,27 @@
         <span>📲</span>
         <span>Cài App lên Máy tính bảng</span>
       </button>
+
+      <div class="mode-switch" role="tablist" aria-label="Chế độ chơi">
+        <button class="mode-tab active" id="tabFreeMode" data-mode="free" type="button">🌈 Tự do</button>
+        <button class="mode-tab" id="tabPuzzleMode" data-mode="puzzle" type="button">🎯 Giải đố</button>
+      </div>
+
+      <div class="puzzle-panel" id="puzzleSidebarPanel">
+        <div class="op-section-title">
+          <span>Độ khó mục tiêu</span>
+          <span id="puzzleDiffDesc" style="color:#b45309;">2–3 bước</span>
+        </div>
+        <div class="diff-row">
+          <button class="diff-btn active" data-diff="easy" type="button">Dễ</button>
+          <button class="diff-btn" data-diff="medium" type="button">Vừa</button>
+          <button class="diff-btn" data-diff="hard" type="button">Khó</button>
+        </div>
+        <div class="puzzle-actions">
+          <button class="puzzle-action-btn new-target" id="btnNewPuzzle" type="button">🎲 Số khác</button>
+          <button class="puzzle-action-btn hint" id="btnPuzzleHint" type="button">💡 Gợi ý</button>
+        </div>
+      </div>
 
       <div class="equation-box" id="equationBox">
         Bắt đầu từ số 1
@@ -596,7 +957,7 @@
         </div>
       </section>
 
-      <section class="op-section">
+      <section class="op-section" id="presetSection">
         <div class="op-section-title">
           <span>Khám phá nhanh</span>
           <span style="color:#64748b;">Bấm thử!</span>
@@ -907,6 +1268,193 @@
       }
 
       // =========================================================================
+      // 2B. PUZZLE GENERATOR & BIDIRECTIONAL BFS HINT SOLVER
+      // =========================================================================
+      const PUZZLE_OPS = [
+        { op: 'add', val: 1n, label: '+ 1' },
+        { op: 'sub', val: 1n, label: '- 1' },
+        { op: 'sub', val: 2n, label: '- 2' },
+        { op: 'sub', val: 3n, label: '- 3' },
+        { op: 'add', val: 100n, label: '+ 100' },
+        { op: 'sub', val: 100n, label: '- 100' },
+        { op: 'add', val: 1000n, label: '+ 1.000' },
+        { op: 'sub', val: 1000n, label: '- 1.000' },
+        { op: 'mul', val: 2n, label: '× 2' },
+        { op: 'div', val: 2n, label: '÷ 2' },
+        { op: 'mul', val: 3n, label: '× 3' },
+        { op: 'div', val: 3n, label: '÷ 3' },
+        { op: 'mul', val: 5n, label: '× 5' },
+        { op: 'div', val: 5n, label: '÷ 5' },
+        { op: 'mul', val: 7n, label: '× 7' },
+        { op: 'div', val: 7n, label: '÷ 7' },
+        { op: 'mul', val: 10n, label: '× 10' },
+        { op: 'div', val: 10n, label: '÷ 10' }
+      ];
+
+      function applyOpBigInt(cur, op, val) {
+        if (op === 'add') {
+          const next = cur + val;
+          return next <= MAX_VALUE ? next : null;
+        }
+        if (op === 'sub') {
+          const next = cur - val;
+          return next >= 1n ? next : null;
+        }
+        if (op === 'mul') {
+          const next = cur * val;
+          return next <= MAX_VALUE ? next : null;
+        }
+        if (op === 'div') {
+          if (cur % val !== 0n) return null;
+          const next = cur / val;
+          return next >= 1n ? next : null;
+        }
+        return null;
+      }
+
+      function generatePuzzleTarget(fromVal, difficulty = 'easy') {
+        const minSteps = difficulty === 'easy' ? 2 : (difficulty === 'medium' ? 3 : 4);
+        const maxSteps = difficulty === 'easy' ? 3 : (difficulty === 'medium' ? 4 : 6);
+        const stepCount = minSteps + Math.floor(Math.random() * (maxSteps - minSteps + 1));
+
+        for (let attempt = 0; attempt < 30; attempt++) {
+          let cur = fromVal;
+          const seen = new Set([fromVal.toString()]);
+          const opsTaken = [];
+
+          for (let s = 0; s < stepCount; s++) {
+            const candidates = [];
+            for (const entry of PUZZLE_OPS) {
+              // Keep 'easy' numbers friendly for 8-year-olds when starting small
+              if (difficulty === 'easy' && cur < 100n && (entry.val === 100n || entry.val === 1000n)) {
+                continue;
+              }
+              const next = applyOpBigInt(cur, entry.op, entry.val);
+              if (next === null) continue;
+              const nextStr = next.toString();
+              if (seen.has(nextStr)) continue;
+              // For easy/medium avoid bloating beyond 1000x current if starting small unless intended
+              if (difficulty === 'easy' && next > 1000000n && fromVal < 1000n) continue;
+              candidates.push({ entry, next, nextStr });
+            }
+
+            if (candidates.length === 0) break;
+            const pick = candidates[Math.floor(Math.random() * candidates.length)];
+            cur = pick.next;
+            seen.add(pick.nextStr);
+            opsTaken.push(pick.entry);
+          }
+
+          if (cur !== fromVal && opsTaken.length >= 2) {
+            return { target: cur, ops: opsTaken };
+          }
+        }
+
+        // Guaranteed deterministic fallback if all constrained walks hit bounds (e.g. near MAX_VALUE)
+        let fallbackCur = fromVal;
+        const fallbackOps = [];
+        for (const entry of PUZZLE_OPS) {
+          const next = applyOpBigInt(fallbackCur, entry.op, entry.val);
+          if (next !== null && next !== fromVal) {
+            fallbackCur = next;
+            fallbackOps.push(entry);
+            break;
+          }
+        }
+        return { target: fallbackCur, ops: fallbackOps };
+      }
+
+      /**
+       * Bidirectional BFS over PUZZLE_OPS to find the exact next optimal operation
+       * from curVal toward targetVal in milliseconds (supports 6+ step puzzles).
+       */
+      function findShortestHintOp(curVal, targetVal) {
+        if (curVal === targetVal) return null;
+        const startKey = curVal.toString();
+        const targetKey = targetVal.toString();
+
+        const fVisited = new Set([startKey]);
+        const bVisited = new Set([targetKey]);
+        const fParent = new Map(); // nodeKey -> { prevKey, entry }
+        const bChild = new Map();  // nodeKey -> { nextKey, entry }
+
+        let fQueue = [curVal];
+        let bQueue = [targetVal];
+        let totalVisited = 2;
+        const MAX_STATES = 16000;
+
+        function extractFirstForwardStep(meetKey) {
+          if (meetKey === startKey) {
+            const step = bChild.get(startKey);
+            return step ? step.entry : null;
+          }
+          let cursor = meetKey;
+          while (fParent.has(cursor)) {
+            const info = fParent.get(cursor);
+            if (info.prevKey === startKey) return info.entry;
+            cursor = info.prevKey;
+          }
+          return null;
+        }
+
+        while (fQueue.length > 0 && bQueue.length > 0 && totalVisited < MAX_STATES) {
+          if (fQueue.length <= bQueue.length) {
+            const nextQueue = [];
+            for (const u of fQueue) {
+              const uKey = u.toString();
+              for (const entry of PUZZLE_OPS) {
+                const v = applyOpBigInt(u, entry.op, entry.val);
+                if (v === null) continue;
+                const vKey = v.toString();
+                if (fVisited.has(vKey)) continue;
+                fVisited.add(vKey);
+                fParent.set(vKey, { prevKey: uKey, entry });
+                totalVisited++;
+                if (bVisited.has(vKey)) {
+                  return extractFirstForwardStep(vKey);
+                }
+                nextQueue.push(v);
+                if (totalVisited >= MAX_STATES) break;
+              }
+              if (totalVisited >= MAX_STATES) break;
+            }
+            fQueue = nextQueue;
+          } else {
+            const nextQueue = [];
+            for (const u of bQueue) {
+              const uKey = u.toString();
+              for (const entry of PUZZLE_OPS) {
+                let prevVal = null;
+                if (entry.op === 'add') {
+                  if (u - entry.val >= 1n) prevVal = u - entry.val;
+                } else if (entry.op === 'sub') {
+                  if (u + entry.val <= MAX_VALUE) prevVal = u + entry.val;
+                } else if (entry.op === 'mul') {
+                  if (u % entry.val === 0n && u / entry.val >= 1n) prevVal = u / entry.val;
+                } else if (entry.op === 'div') {
+                  if (u * entry.val <= MAX_VALUE) prevVal = u * entry.val;
+                }
+                if (prevVal === null) continue;
+                const prevKey = prevVal.toString();
+                if (bVisited.has(prevKey)) continue;
+                bVisited.add(prevKey);
+                bChild.set(prevKey, { nextKey: uKey, entry });
+                totalVisited++;
+                if (fVisited.has(prevKey)) {
+                  return extractFirstForwardStep(prevKey);
+                }
+                nextQueue.push(prevVal);
+                if (totalVisited >= MAX_STATES) break;
+              }
+              if (totalVisited >= MAX_STATES) break;
+            }
+            bQueue = nextQueue;
+          }
+        }
+        return null;
+      }
+
+      // =========================================================================
       // 3. RECURSIVE CHARACTER GEOMETRY ENGINE (Quy_uoc_mau.rtf)
       // =========================================================================
       /**
@@ -1165,6 +1713,39 @@
         playError() {
           this.playTone(220, 170, 0.14, 'sawtooth', 0.09, 0);
           this.playTone(170, 130, 0.18, 'sawtooth', 0.09, 0.12);
+        },
+        playFireworkPop() {
+          this.playTone(260, 740, 0.14, 'sine', 0.09, 0);
+          this.playTone(1180, 320, 0.24, 'triangle', 0.1, 0.08);
+          this.playTone(150, 55, 0.2, 'sine', 0.11, 0.09);
+        },
+        playVictoryFanfare() {
+          // Festive celebratory melody + harmony
+          const melody = [
+            [523.25, 0.0, 0.14],  // C5
+            [659.25, 0.12, 0.14], // E5
+            [783.99, 0.24, 0.14], // G5
+            [1046.5, 0.38, 0.28], // C6
+            [783.99, 0.66, 0.12], // G5
+            [1046.5, 0.80, 0.22], // C6
+            [1174.66, 1.04, 0.14],// D6
+            [1318.51, 1.18, 0.22],// E6
+            [1046.5, 1.42, 0.16], // C6
+            [1567.98, 1.60, 0.55] // G6
+          ];
+          melody.forEach(([freq, delay, dur]) => {
+            this.playTone(freq, freq * 1.01, dur, 'triangle', 0.16, delay);
+          });
+          const bass = [
+            [261.63, 0.0, 0.34],
+            [196.00, 0.38, 0.38],
+            [220.00, 0.80, 0.36],
+            [261.63, 1.18, 0.42],
+            [392.00, 1.60, 0.55]
+          ];
+          bass.forEach(([freq, delay, dur]) => {
+            this.playTone(freq, freq, dur, 'sine', 0.12, delay);
+          });
         }
       };
 
@@ -1193,11 +1774,27 @@
         blinkTimer: 2.5,
         isBlinking: false,
 
-        // Particles & floating blocks
+        // Particles, Fireworks & Celebration
         stars: [],
         flyingBlocks: [],
         floatingText: null,
-        speechTimer: null
+        speechTimer: null,
+        celebrationTimer: 0,
+        fireworkSpawnTimer: 0,
+        fireworks: [],
+        confetti: [],
+
+        // Puzzle mode state
+        puzzle: {
+          active: false,
+          difficulty: 'easy',
+          startValue: 1n,
+          target: 10n,
+          steps: 0,
+          solved: false,
+          solvedCount: 0,
+          solutionOps: []
+        }
       };
 
       state.model = buildCharacterModel(1n);
@@ -2373,6 +2970,54 @@
         }
       }
 
+      function spawnFireworkBurst(x, y, playAudio = true) {
+        const palette = ['#EE1C25', '#F7941D', '#FFF200', '#39B54A', '#00AEEF', '#A855F7', '#EC008C', '#FFFFFF'];
+        const mainColor = palette[Math.floor(Math.random() * (palette.length - 1))];
+        const subColor = palette[Math.floor(Math.random() * palette.length)];
+        const count = 38;
+        for (let i = 0; i < count; i++) {
+          const ang = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.16;
+          const ring = i % 2 === 0 ? 1.0 : 0.58;
+          const speed = (190 + Math.random() * 210) * ring;
+          state.fireworks.push({
+            x,
+            y,
+            px: x,
+            py: y,
+            vx: Math.cos(ang) * speed,
+            vy: Math.sin(ang) * speed,
+            size: i % 3 === 0 ? 5.0 : 3.4,
+            color: i % 2 === 0 ? mainColor : subColor,
+            life: 1.0,
+            decay: 0.62 + Math.random() * 0.3,
+            isStar: i % 5 === 0
+          });
+        }
+        if (playAudio) SoundFX.playFireworkPop();
+      }
+
+      function spawnConfetti(count = 65, scatterSky = false) {
+        const colors = ['#EE1C25', '#F7941D', '#FACC15', '#22C55E', '#38BDF8', '#A855F7', '#EC4899'];
+        for (let i = 0; i < count; i++) {
+          const startY = (scatterSky && i < count * 0.65)
+            ? (Math.random() * stageH * 0.68)
+            : (-20 - Math.random() * (stageH * 0.25));
+          state.confetti.push({
+            x: Math.random() * stageW,
+            y: startY,
+            vx: (Math.random() - 0.5) * 75,
+            vy: 95 + Math.random() * 145,
+            w: 9 + Math.random() * 6,
+            h: 5 + Math.random() * 5,
+            rot: Math.random() * Math.PI * 2,
+            vrot: (Math.random() - 0.5) * 8,
+            swayPhase: Math.random() * Math.PI * 2,
+            color: colors[i % colors.length],
+            life: 1.0
+          });
+        }
+      }
+
       // =========================================================================
       // 9. MAIN RENDER LOOP
       // =========================================================================
@@ -2386,6 +3031,19 @@
         // Physics updates
         state.animLogScale += (state.targetLogScale - state.animLogScale) * Math.min(1, dt * 6);
         if (state.tierFade < 1) state.tierFade = Math.min(1, state.tierFade + dt * 2.5);
+
+        // Celebration timer & auto firework bursts
+        if (state.celebrationTimer > 0) {
+          state.celebrationTimer = Math.max(0, state.celebrationTimer - dt);
+          state.fireworkSpawnTimer -= dt;
+          if (state.fireworkSpawnTimer <= 0) {
+            const fx = stageW * (0.14 + Math.random() * 0.72);
+            const fy = stageH * (0.18 + Math.random() * 0.32);
+            spawnFireworkBurst(fx, fy, true);
+            if (state.confetti.length < 90) spawnConfetti(14);
+            state.fireworkSpawnTimer = 0.42 + Math.random() * 0.28;
+          }
+        }
 
         // Spring bounce
         const force = (1 - state.scaleBounce) * 140;
@@ -2410,6 +3068,13 @@
           state.isBlinking = !state.isBlinking;
           state.blinkTimer = state.isBlinking ? 0.13 : (2.2 + Math.random() * 3.0);
         }
+
+        const isDancing = state.celebrationTimer > 0 || (state.puzzle.active && state.puzzle.solved);
+        const danceIntensity = state.celebrationTimer > 0 ? 1.0 : 0.32;
+        const danceSpeed = state.celebrationTimer > 0 ? 8.5 : 4.5;
+        const danceJumpY = isDancing ? Math.abs(Math.sin(t * danceSpeed)) * 32 * danceIntensity : 0;
+        const danceTilt = isDancing ? Math.sin(t * danceSpeed) * 0.11 * danceIntensity : 0;
+        const danceSquash = isDancing ? 1 + Math.sin(t * danceSpeed * 2) * 0.08 * danceIntensity : 1;
 
         ctx.save();
         ctx.scale(dpr, dpr);
@@ -2453,11 +3118,20 @@
         const projWidthPx = spanW * unitPx;
         const originX = stageW * 0.5 - (m.totalW * unitPx) * 0.5 + state.shakeOffset;
 
-        // Ground shadow under feet
+        // Ground shadow under feet (shrinks slightly during celebratory jumps)
+        const shadowScale = Math.max(0.55, 1 - danceJumpY / 70);
         ctx.save();
         ctx.fillStyle = tier.id >= 4 ? 'rgba(148, 163, 184, 0.2)' : 'rgba(15, 23, 42, 0.24)';
         ctx.beginPath();
-        ctx.ellipse(stageW * 0.5 + state.shakeOffset, groundY + 4, Math.max(24, projWidthPx * 0.42), 9, 0, 0, Math.PI * 2);
+        ctx.ellipse(
+          stageW * 0.5 + state.shakeOffset,
+          groundY + 4,
+          Math.max(24, projWidthPx * 0.42) * shadowScale,
+          9 * shadowScale,
+          0,
+          0,
+          Math.PI * 2
+        );
         ctx.fill();
         ctx.restore();
 
@@ -2472,32 +3146,41 @@
           ? '#EE1C25'
           : (DIGIT_COLORS[rightMod.digit] ? DIGIT_COLORS[rightMod.digit].arm : primaryColor);
 
-        // Apply spring squash & stretch around feet center
+        // Apply spring squash & stretch + celebratory jump & dance tilt around feet center
         ctx.save();
         const pivotX = stageW * 0.5 + state.shakeOffset;
         const pivotY = groundY;
-        ctx.translate(pivotX, pivotY);
-        const sx = 2 - state.scaleBounce; // volume-preserving squash & stretch
-        const sy = state.scaleBounce;
+        ctx.translate(pivotX, pivotY - danceJumpY);
+        ctx.rotate(danceTilt);
+        const bounceCombined = state.scaleBounce * danceSquash;
+        const sx = 2 - bounceCombined; // volume-preserving squash & stretch
+        const sy = bounceCombined;
         ctx.scale(Math.max(0.75, Math.min(1.25, sx)), Math.max(0.75, Math.min(1.3, sy)));
         ctx.translate(-pivotX, -pivotY);
 
-        // 1) Legs & Red Sneakers
+        // 1) Legs & Red Sneakers (kicking joyfully when dancing)
         const leftFootX = originX + Math.max(10, m.totalW * unitPx * 0.28);
         const rightFootX = originX + Math.min(m.totalW * unitPx - 10, m.totalW * unitPx * 0.72);
         const clampedSpread = Math.min(85, Math.max(14, (rightFootX - leftFootX) * 0.5));
         const midBaseX = originX + (m.totalW * unitPx) * 0.5;
-        drawLegAndShoe(midBaseX - clampedSpread, charBottomY, legLen, primaryColor, -1);
-        drawLegAndShoe(midBaseX + clampedSpread, charBottomY, legLen, rightColor, 1);
+        const leftLegLift = isDancing ? Math.max(0, Math.sin(t * danceSpeed)) * 10 * danceIntensity : 0;
+        const rightLegLift = isDancing ? Math.max(0, -Math.sin(t * danceSpeed)) * 10 * danceIntensity : 0;
+        drawLegAndShoe(midBaseX - clampedSpread, charBottomY - leftLegLift, legLen, primaryColor, -1);
+        drawLegAndShoe(midBaseX + clampedSpread, charBottomY - rightLegLift, legLen, rightColor, 1);
 
         // 2) Left Arm (behind/left of leftmost block)
         const armLen = Math.max(24, Math.min(72, m.totalH * unitPx * 0.42));
         const leftArmY = charBottomY - Math.max(unitPx * 0.45, firstMod.h * unitPx * 0.56);
         const idleWave = Math.sin(t * 2.5) * 0.12;
-        const rightWave = state.exprTimer > 0 && state.expression !== 'confused'
-          ? -0.65 + Math.sin(t * 10) * 0.25
-          : 0.35 + idleWave;
-        drawArm(originX + 2, leftArmY, -1, armLen, primaryColor, 0.48 - idleWave);
+        const leftWave = isDancing
+          ? (-0.82 + Math.sin(t * 14) * 0.35)
+          : (0.48 - idleWave);
+        const rightWave = isDancing
+          ? (-0.82 - Math.sin(t * 14) * 0.35)
+          : (state.exprTimer > 0 && state.expression !== 'confused'
+            ? -0.65 + Math.sin(t * 10) * 0.25
+            : 0.35 + idleWave);
+        drawArm(originX + 2, leftArmY, -1, armLen, primaryColor, leftWave);
 
         // 3) Isometric 3D Numberblocks Body
         drawCharacterBlocks(originX, charBottomY, unitPx, m);
@@ -2533,7 +3216,8 @@
           firstMod.h * faceYFrac,
           0
         );
-        drawFace(facePt.x, facePt.y, faceSize, state.expression, state.isBlinking);
+        const activeExpr = isDancing ? 'laugh' : state.expression;
+        drawFace(facePt.x, facePt.y, faceSize, activeExpr, isDancing ? false : state.isBlinking);
 
         // 6) Tiny Remainder Magnifier Chip (when N spans > 2 powers of 1000, e.g., 1,000,001)
         if (m.tinyRemainder > 0n) {
@@ -2575,9 +3259,9 @@
         );
         const badgeR = Math.max(19, Math.min(30, unitPx * 0.55 + 12));
         const badgeFloat = Math.sin(t * 2.8) * 3;
-        drawNumberling(topCenter.x, Math.max(96, topCenter.y - badgeR - 14 + badgeFloat), formatBigInt(state.value), badgeR);
+        drawNumberling(topCenter.x, Math.max(106, topCenter.y - badgeR - 14 + badgeFloat), formatBigInt(state.value), badgeR);
 
-        ctx.restore(); // end squash/stretch
+        ctx.restore(); // end squash/stretch & dance
 
         // 8) Sparkle stars
         for (let i = state.stars.length - 1; i >= 0; i--) {
@@ -2591,6 +3275,60 @@
             state.stars.splice(i, 1);
           } else {
             drawFivePointStar(st.x, st.y, st.r, st.color, st.rot, st.life);
+          }
+        }
+
+        // 8B) Confetti ribbons
+        for (let i = state.confetti.length - 1; i >= 0; i--) {
+          const cf = state.confetti[i];
+          cf.x += (cf.vx + Math.sin(t * 5 + cf.swayPhase) * 35) * dt;
+          cf.y += cf.vy * dt;
+          cf.rot += cf.vrot * dt;
+          if (cf.y > stageH + 30) {
+            state.confetti.splice(i, 1);
+          } else {
+            ctx.save();
+            ctx.translate(cf.x, cf.y);
+            ctx.rotate(cf.rot);
+            ctx.scale(1, Math.cos(t * 7 + cf.swayPhase));
+            ctx.fillStyle = cf.color;
+            ctx.strokeStyle = 'rgba(15, 23, 42, 0.35)';
+            ctx.lineWidth = 1;
+            ctx.fillRect(-cf.w / 2, -cf.h / 2, cf.w, cf.h);
+            ctx.strokeRect(-cf.w / 2, -cf.h / 2, cf.w, cf.h);
+            ctx.restore();
+          }
+        }
+
+        // 8C) Fireworks bursts
+        for (let i = state.fireworks.length - 1; i >= 0; i--) {
+          const fw = state.fireworks[i];
+          fw.px = fw.x;
+          fw.py = fw.y;
+          fw.vx *= Math.exp(-1.8 * dt);
+          fw.vy = fw.vy * Math.exp(-1.8 * dt) + 190 * dt;
+          fw.x += fw.vx * dt;
+          fw.y += fw.vy * dt;
+          fw.life -= fw.decay * dt;
+          if (fw.life <= 0) {
+            state.fireworks.splice(i, 1);
+          } else if (fw.isStar) {
+            drawFivePointStar(fw.x, fw.y, fw.size * 2.1, fw.color, t * 4, fw.life);
+          } else {
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, fw.life);
+            ctx.strokeStyle = fw.color;
+            ctx.lineWidth = fw.size;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(fw.px, fw.py);
+            ctx.lineTo(fw.x, fw.y);
+            ctx.stroke();
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(fw.x, fw.y, fw.size * 0.55, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
           }
         }
 
@@ -2636,6 +3374,35 @@
       const speechBubble = document.getElementById('speechBubble');
       const opButtons = Array.from(document.querySelectorAll('.op-btn'));
 
+      const puzzleHudCard = document.getElementById('puzzleHudCard');
+      const puzzleStepsChip = document.getElementById('puzzleStepsChip');
+      const puzzleSolvedChip = document.getElementById('puzzleSolvedChip');
+      const puzzleTargetNum = document.getElementById('puzzleTargetNum');
+      const puzzleTargetVn = document.getElementById('puzzleTargetVn');
+      const puzzleStatusPill = document.getElementById('puzzleStatusPill');
+      const puzzleWinBanner = document.getElementById('puzzleWinBanner');
+      const puzzleWinSub = document.getElementById('puzzleWinSub');
+      const btnNextPuzzle = document.getElementById('btnNextPuzzle');
+      const tabFreeMode = document.getElementById('tabFreeMode');
+      const tabPuzzleMode = document.getElementById('tabPuzzleMode');
+      const diffButtons = Array.from(document.querySelectorAll('.diff-btn'));
+      const puzzleDiffDesc = document.getElementById('puzzleDiffDesc');
+      const btnNewPuzzle = document.getElementById('btnNewPuzzle');
+      const btnPuzzleHint = document.getElementById('btnPuzzleHint');
+      const btnReset = document.getElementById('btnReset');
+
+      const DIFF_LABELS = {
+        easy: '2–3 bước',
+        medium: '3–4 bước',
+        hard: '4–6 bước'
+      };
+      let hintTimeout = null;
+
+      function clearHintGlow() {
+        clearTimeout(hintTimeout);
+        opButtons.forEach((b) => b.classList.remove('hint-glow'));
+      }
+
       function showSpeech(msg, durationMs = 3000) {
         speechBubble.textContent = msg;
         speechBubble.classList.add('visible');
@@ -2649,7 +3416,105 @@
         try {
           localStorage.setItem('nb_value', state.value.toString());
           localStorage.setItem('nb_sound', SoundFX.enabled ? '1' : '0');
+          localStorage.setItem('nb_solved_count', String(state.puzzle.solvedCount));
         } catch (e) {}
+      }
+
+      function triggerCelebration(showBanner = true) {
+        state.celebrationTimer = 6.5;
+        state.fireworkSpawnTimer = 0.28;
+        state.expression = 'laugh';
+        state.exprTimer = 6.5;
+        state.scaleBounce = 1.28;
+
+        const sw = Math.max(400, stageW);
+        const sh = Math.max(400, stageH);
+        spawnFireworkBurst(sw * 0.18, sh * 0.28, true);
+        spawnFireworkBurst(sw * 0.42, sh * 0.20, false);
+        spawnFireworkBurst(sw * 0.82, sh * 0.28, false);
+        spawnConfetti(85, true);
+        spawnSparkleStars(sw * 0.5, sh * 0.48, 28);
+        SoundFX.playVictoryFanfare();
+
+        if (showBanner) {
+          clearTimeout(state.speechTimer);
+          speechBubble.classList.remove('visible');
+          puzzleWinSub.textContent = `Bé đã đạt số ${formatBigInt(state.puzzle.target)} sau ${state.puzzle.steps} bước tính!`;
+          puzzleWinBanner.classList.add('show');
+        }
+      }
+
+      function updatePuzzleHUD() {
+        const isPuzzle = state.puzzle.active;
+        document.body.classList.toggle('mode-puzzle', isPuzzle);
+        tabFreeMode.classList.toggle('active', !isPuzzle);
+        tabPuzzleMode.classList.toggle('active', isPuzzle);
+        btnReset.textContent = isPuzzle ? '↺ Về đầu' : '↺ Về 1';
+
+        if (!isPuzzle) {
+          puzzleWinBanner.classList.remove('show');
+          return;
+        }
+
+        const tVal = state.puzzle.target;
+        puzzleTargetNum.textContent = formatBigInt(tVal);
+        puzzleTargetVn.textContent = bigIntToVietnamese(tVal);
+        puzzleStepsChip.textContent = `Bước: ${state.puzzle.steps}`;
+        puzzleSolvedChip.textContent = `🏆 Đã giải: ${state.puzzle.solvedCount}`;
+
+        const matched = state.value === tVal;
+        puzzleHudCard.classList.toggle('solved', matched || state.puzzle.solved);
+        if (matched || state.puzzle.solved) {
+          puzzleStatusPill.textContent = '🎉 ĐÃ ĐẠT MỤC TIÊU!';
+          puzzleStatusPill.className = 'puzzle-status-pill match';
+        } else if (state.value < tVal) {
+          puzzleStatusPill.textContent = '▲ Cần tăng thêm';
+          puzzleStatusPill.className = 'puzzle-status-pill up';
+        } else {
+          puzzleStatusPill.textContent = '▼ Cần giảm bớt';
+          puzzleStatusPill.className = 'puzzle-status-pill down';
+        }
+        puzzleWinBanner.classList.toggle('show', state.puzzle.solved);
+      }
+
+      function startPuzzleRound(customTarget = null, skipSave = false) {
+        clearHintGlow();
+        state.celebrationTimer = 0;
+        state.fireworks = [];
+        state.confetti = [];
+        state.puzzle.startValue = state.value;
+        state.puzzle.steps = 0;
+        state.puzzle.solved = false;
+        state.history = [];
+
+        if (customTarget !== null && customTarget >= 1n && customTarget <= MAX_VALUE) {
+          state.puzzle.target = customTarget;
+          state.puzzle.solutionOps = [];
+        } else {
+          const gen = generatePuzzleTarget(state.value, state.puzzle.difficulty);
+          state.puzzle.target = gen.target;
+          state.puzzle.solutionOps = gen.ops;
+        }
+
+        equationBox.textContent = `Mục tiêu: ${formatBigInt(state.puzzle.target)}`;
+        updateUI(skipSave);
+        showSpeech(`Thử thách mới! Biến thành số ${formatBigInt(state.puzzle.target)} nhé!`, 3400);
+      }
+
+      function setGameMode(mode, customTarget = null, skipSave = false) {
+        clearHintGlow();
+        if (mode === 'puzzle') {
+          state.puzzle.active = true;
+          startPuzzleRound(customTarget, skipSave);
+        } else {
+          state.puzzle.active = false;
+          state.puzzle.solved = false;
+          state.celebrationTimer = 0;
+          state.fireworks = [];
+          state.confetti = [];
+          updateUI(skipSave);
+          showSpeech('Chế độ Tự do: Bé thỏa sức biến hóa con số nhé!', 2600);
+        }
       }
 
       function updateUI(skipSave = false) {
@@ -2677,10 +3542,12 @@
 
         document.getElementById('btnUndo').disabled = state.history.length === 0;
         document.getElementById('btnUndo').style.opacity = state.history.length === 0 ? '0.5' : '1';
+        updatePuzzleHUD();
         if (!skipSave) savePrefs();
       }
 
-      function commitNewValue(newVal, eqText, isGrow, opBadgeText, opColor) {
+      function commitNewValue(newVal, eqText, isGrow, opBadgeText, opColor, countPuzzleStep = true) {
+        clearHintGlow();
         const oldTier = state.tier;
         state.history.push(state.value);
         if (state.history.length > 60) state.history.shift();
@@ -2691,14 +3558,26 @@
         state.tier = newTier;
         state.targetLogScale = getLog10Approx(newVal);
 
+        let justSolved = false;
+        if (state.puzzle.active && !state.puzzle.solved && countPuzzleStep) {
+          state.puzzle.steps += 1;
+          if (newVal === state.puzzle.target) {
+            state.puzzle.solved = true;
+            state.puzzle.solvedCount += 1;
+            justSolved = true;
+          }
+        }
+
         if (newTier.id !== oldTier.id) {
           state.prevTierId = oldTier.id;
           state.tierFade = 0;
-          if (newTier.id > oldTier.id) {
-            SoundFX.playLevelUp();
-            showSpeech(`Oa! Đã lớn tới "${newTier.title}" rồi!`, 3600);
-          } else {
-            showSpeech(`Thu nhỏ về "${newTier.title}" nào!`, 2600);
+          if (!justSolved) {
+            if (newTier.id > oldTier.id) {
+              SoundFX.playLevelUp();
+              showSpeech(`Oa! Đã lớn tới "${newTier.title}" rồi!`, 3600);
+            } else {
+              showSpeech(`Thu nhỏ về "${newTier.title}" nào!`, 2600);
+            }
           }
         }
 
@@ -2721,6 +3600,9 @@
 
         equationBox.textContent = eqText;
         updateUI();
+        if (justSolved) {
+          triggerCelebration(true);
+        }
       }
 
       function triggerInvalid(btn, msg) {
@@ -2774,15 +3656,101 @@
         });
       });
 
+      // Mode tabs, difficulty buttons, puzzle controls
+      tabFreeMode.addEventListener('click', () => {
+        if (!state.puzzle.active) return;
+        SoundFX.playAdd();
+        setGameMode('free');
+      });
+
+      tabPuzzleMode.addEventListener('click', () => {
+        if (state.puzzle.active) return;
+        SoundFX.playMultiply();
+        setGameMode('puzzle');
+      });
+
+      diffButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const d = btn.dataset.diff;
+          state.puzzle.difficulty = d;
+          diffButtons.forEach((b) => b.classList.toggle('active', b === btn));
+          puzzleDiffDesc.textContent = DIFF_LABELS[d] || '';
+          if (state.puzzle.active) {
+            SoundFX.playAdd();
+            startPuzzleRound();
+          }
+        });
+      });
+
+      btnNewPuzzle.addEventListener('click', () => {
+        if (!state.puzzle.active) return;
+        SoundFX.playMultiply();
+        startPuzzleRound();
+      });
+
+      btnNextPuzzle.addEventListener('click', () => {
+        if (!state.puzzle.active) return;
+        SoundFX.playMultiply();
+        startPuzzleRound();
+      });
+
+      btnPuzzleHint.addEventListener('click', () => {
+        if (!state.puzzle.active || state.puzzle.solved) return;
+        clearHintGlow();
+        let hint = findShortestHintOp(state.value, state.puzzle.target);
+        if (!hint && state.value === state.puzzle.startValue && state.puzzle.solutionOps.length > 0) {
+          hint = state.puzzle.solutionOps[0];
+        }
+        if (hint) {
+          const matchBtn = opButtons.find(
+            (b) => b.dataset.op === hint.op && b.dataset.val === hint.val.toString()
+          );
+          if (matchBtn) {
+            matchBtn.classList.add('hint-glow');
+            hintTimeout = setTimeout(() => matchBtn.classList.remove('hint-glow'), 3500);
+          }
+          SoundFX.playAdd();
+          showSpeech(`💡 Gợi ý: Bé thử bấm nút [ ${hint.label} ] nhé!`, 3500);
+        } else {
+          SoundFX.playError();
+          showSpeech(`💡 Bé đi hơi xa rồi! Bấm [↶ Lùi] hoặc [↺ Về đầu] về số ${formatBigInt(state.puzzle.startValue)} nhé!`, 3600);
+        }
+      });
+
       // Reset, Undo, Sound, Fullscreen & Android Back Hook
-      document.getElementById('btnReset').addEventListener('click', () => {
+      btnReset.addEventListener('click', () => {
+        clearHintGlow();
+        if (state.puzzle.active) {
+          if (state.puzzle.solved) {
+            SoundFX.playMultiply();
+            startPuzzleRound();
+            return;
+          }
+          const startVal = state.puzzle.startValue;
+          const oldTier = state.tier;
+          state.value = startVal;
+          state.model = buildCharacterModel(startVal);
+          state.tier = getWorldTier(startVal);
+          if (state.tier.id !== oldTier.id) {
+            state.prevTierId = oldTier.id;
+            state.tierFade = 0;
+          }
+          state.targetLogScale = getLog10Approx(startVal);
+          state.puzzle.steps = 0;
+          state.history = [];
+          SoundFX.playDivide();
+          equationBox.textContent = `Bắt đầu lại từ ${formatBigInt(startVal)}`;
+          updateUI();
+          return;
+        }
         if (state.value === 1n) return;
         SoundFX.playDivide();
-        commitNewValue(1n, 'Đặt lại về số 1', false, 'Về 1', '#fde047');
+        commitNewValue(1n, 'Đặt lại về số 1', false, 'Về 1', '#fde047', false);
       });
 
       function performUndo() {
         if (state.history.length === 0) return false;
+        clearHintGlow();
         const prev = state.history.pop();
         const isGrow = prev > state.value;
         state.value = prev;
@@ -2795,6 +3763,9 @@
         state.tier = newTier;
         state.targetLogScale = getLog10Approx(prev);
         state.scaleBounce = isGrow ? 1.18 : 0.84;
+        if (state.puzzle.active && !state.puzzle.solved && state.puzzle.steps > 0) {
+          state.puzzle.steps -= 1;
+        }
         SoundFX.playAdd();
         equationBox.textContent = `Quay lại số ${formatBigInt(prev)}`;
         updateUI();
@@ -2839,12 +3810,16 @@
           if (target === state.value) return;
           const isGrow = target > state.value;
           if (isGrow) SoundFX.playMultiply(); else SoundFX.playDivide();
-          commitNewValue(target, `Khám phá số ${formatBigInt(target)}`, isGrow, chip.textContent, '#facc15');
+          commitNewValue(target, `Khám phá số ${formatBigInt(target)}`, isGrow, chip.textContent, '#facc15', false);
         });
       });
 
-      // Initial render: restore URL ?n=... or saved localStorage value
-      const urlN = new URLSearchParams(window.location.search).get('n');
+      // Initial render: restore URL params or saved localStorage value
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlN = urlParams.get('n');
+      const urlMode = urlParams.get('mode');
+      const urlTarget = urlParams.get('target');
+      const urlCelebrate = urlParams.get('celebrate');
       let restoredVal = null;
       if (urlN && /^\d+$/.test(urlN)) {
         restoredVal = BigInt(urlN);
@@ -2860,6 +3835,10 @@
           }
         } catch (e) {}
       }
+      try {
+        const savedSolved = parseInt(localStorage.getItem('nb_solved_count') || '0', 10);
+        if (Number.isFinite(savedSolved) && savedSolved > 0) state.puzzle.solvedCount = savedSolved;
+      } catch (e) {}
 
       if (restoredVal && restoredVal >= 1n && restoredVal <= MAX_VALUE) {
         state.value = restoredVal;
@@ -2868,9 +3847,28 @@
         state.targetLogScale = getLog10Approx(restoredVal);
         state.animLogScale = state.targetLogScale;
       }
-      updateUI(Boolean(urlN));
-      if (state.value === 1n) {
-        showSpeech('Chào bé! Bấm các phép tính bên phải để biến hóa Numberblock nhé!', 4200);
+
+      const customTargetVal = (urlTarget && /^\d+$/.test(urlTarget)) ? BigInt(urlTarget) : null;
+      if (urlMode === 'puzzle') {
+        if (urlCelebrate === '1') {
+          state.puzzle.active = true;
+          state.puzzle.target = (customTargetVal && customTargetVal >= 1n && customTargetVal <= MAX_VALUE)
+            ? customTargetVal
+            : state.value;
+          state.puzzle.startValue = state.value;
+          state.puzzle.steps = 3;
+          state.puzzle.solved = true;
+          equationBox.textContent = `Mục tiêu: ${formatBigInt(state.puzzle.target)}`;
+          updateUI(true);
+          triggerCelebration(true);
+        } else {
+          setGameMode('puzzle', customTargetVal, Boolean(urlN || urlMode));
+        }
+      } else {
+        updateUI(Boolean(urlN));
+        if (state.value === 1n) {
+          showSpeech('Chào bé! Bấm các phép tính bên phải để biến hóa Numberblock nhé!', 4200);
+        }
       }
 
       // Register Service Worker for offline PWA & handle Android WebAPK install prompt
