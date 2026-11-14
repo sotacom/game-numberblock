@@ -1,0 +1,39 @@
+{
+  "id": "./",
+  "name": "Numberblocks — Thế Giới Những Con Số",
+  "short_name": "Numberblocks",
+  "description": "Trò chơi học toán Numberblocks cho trẻ 8 tuổi — từ quả cam nhỏ xíu đến vũ trụ tỉ tỉ",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#38bdf8",
+  "theme_color": "#38bdf8",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

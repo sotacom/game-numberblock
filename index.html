@@ -1,0 +1,2899 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#38bdf8" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <title>Numberblocks — Thế Giới Những Con Số</title>
+  <style>
+    :root {
+      --sidebar-bg: #f0f7ff;
+      --sidebar-border: #c5dcf5;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #475569;
+      --shadow-btn: 0 4px 0 rgba(15, 23, 42, 0.18);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      font-family: 'Nunito', 'Quicksand', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--text-main);
+      background: #0f172a;
+    }
+
+    .app-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    /* ================= LEFT STAGE (75%) ================= */
+    .stage-pane {
+      position: relative;
+      width: 75%;
+      height: 100%;
+      overflow: hidden;
+      background: #87ceeb;
+    }
+
+    #stageCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Top HUD overlay */
+    .hud-top {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .hud-number-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border: 3px solid #1e293b;
+      border-radius: var(--radius-lg);
+      padding: 10px 18px;
+      box-shadow: 0 6px 0 rgba(15, 23, 42, 0.2);
+      max-width: 65%;
+      pointer-events: auto;
+    }
+
+    .hud-value-row {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hud-value {
+      font-size: clamp(1.35rem, 2.5vw, 2.2rem);
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: 0.5px;
+      word-break: break-all;
+    }
+
+    .hud-short-unit {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      padding: 2px 10px;
+      border-radius: 999px;
+      border: 2px solid #1e293b;
+    }
+
+    .hud-vietnamese {
+      margin-top: 4px;
+      font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+      font-weight: 700;
+      color: #1d4ed8;
+      line-height: 1.3;
+    }
+
+    .hud-scale-card {
+      background: rgba(15, 23, 42, 0.84);
+      color: #ffffff;
+      backdrop-filter: blur(8px);
+      border: 3px solid rgba(255, 255, 255, 0.75);
+      border-radius: var(--radius-lg);
+      padding: 10px 16px;
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
+      text-align: right;
+      min-width: 220px;
+      max-width: 34%;
+    }
+
+    .hud-scene-badge {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #fde047;
+    }
+
+    .hud-scale-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .hud-scale-desc {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin-top: 2px;
+    }
+
+    /* Speech Bubble */
+    .speech-bubble {
+      position: absolute;
+      top: 96px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.9);
+      background: #ffffff;
+      border: 3px solid #1e293b;
+      border-radius: 20px;
+      padding: 10px 18px;
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: #0f172a;
+      box-shadow: 0 6px 0 rgba(15, 23, 42, 0.22);
+      max-width: 72%;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 12;
+    }
+
+    .speech-bubble.visible {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    /* Bottom-left mini ruler / structure breakdown */
+    .hud-bottom {
+      position: absolute;
+      bottom: 14px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .structure-pill {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2.5px solid #1e293b;
+      border-radius: 14px;
+      padding: 7px 14px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1e293b;
+      box-shadow: 0 4px 0 rgba(15, 23, 42, 0.16);
+      max-width: 65%;
+    }
+
+    .size-pill {
+      background: rgba(15, 23, 42, 0.82);
+      border: 2.5px solid rgba(255, 255, 255, 0.65);
+      border-radius: 14px;
+      padding: 7px 14px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    /* ================= RIGHT SIDEBAR (25%) ================= */
+    .sidebar-pane {
+      width: 25%;
+      height: 100%;
+      background-color: var(--sidebar-bg);
+      background-image:
+        linear-gradient(to right, rgba(59, 130, 246, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(59, 130, 246, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+      border-left: 4px solid #1e293b;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 11px;
+      gap: 7px;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      text-align: center;
+      padding-bottom: 1px;
+    }
+
+    .logo-title {
+      font-size: clamp(1.1rem, 1.7vw, 1.5rem);
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 0 #1e293b;
+      -webkit-text-stroke: 1.2px #1e293b;
+      line-height: 1.05;
+    }
+
+    .logo-sub {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .equation-box {
+      background: #ffffff;
+      border: 2.5px solid #1e293b;
+      border-radius: var(--radius-md);
+      padding: 5px 8px;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #0f172a;
+      box-shadow: 0 3px 0 rgba(15, 23, 42, 0.12);
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .op-section {
+      background: rgba(255, 255, 255, 0.86);
+      border: 2px solid var(--sidebar-border);
+      border-radius: var(--radius-lg);
+      padding: 7px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .op-section-title {
+      font-size: 0.74rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .op-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .op-btn {
+      position: relative;
+      border: 2.5px solid #1e293b;
+      border-radius: var(--radius-md);
+      padding: 6px 5px;
+      min-height: 40px;
+      font-size: clamp(0.92rem, 1.25vw, 1.1rem);
+      font-weight: 900;
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: var(--shadow-btn);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease, opacity 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .op-btn:hover {
+      filter: brightness(1.06);
+      transform: translateY(-1px);
+    }
+
+    .op-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.25);
+    }
+
+    /* Button group colors */
+    .btn-add {
+      background: linear-gradient(180deg, #22c55e, #16a34a);
+    }
+
+    .btn-sub {
+      background: linear-gradient(180deg, #fb7185, #e11d48);
+    }
+
+    .btn-mul {
+      background: linear-gradient(180deg, #3b82f6, #2563eb);
+    }
+
+    .btn-div {
+      background: linear-gradient(180deg, #a855f7, #7e22ce);
+    }
+
+    /* Visual hint when subtraction < 1 or division has remainder */
+    .op-btn.unavailable {
+      opacity: 0.56;
+      filter: saturate(0.45);
+      border-style: dashed;
+    }
+
+    .op-btn.unavailable::after {
+      content: "!";
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: #facc15;
+      color: #0f172a;
+      border: 2px solid #1e293b;
+      font-size: 0.7rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .util-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+
+    .util-btn {
+      border: 2px solid #1e293b;
+      border-radius: var(--radius-md);
+      padding: 6px 2px;
+      min-height: 36px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      white-space: nowrap;
+      background: #ffffff;
+      color: #0f172a;
+      cursor: pointer;
+      box-shadow: 0 3px 0 rgba(15, 23, 42, 0.16);
+      transition: transform 0.08s ease;
+    }
+
+    /* Portrait rotation hint banner for Android tablets */
+    .rotate-hint {
+      display: none;
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.92);
+      color: #ffffff;
+      border: 2px solid #facc15;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      z-index: 999;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    @media (orientation: portrait) {
+      .rotate-hint:not(.dismissed) {
+        display: flex;
+      }
+    }
+
+    .rotate-hint button {
+      background: #facc15;
+      color: #0f172a;
+      border: none;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .util-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.2);
+    }
+
+    .util-btn.reset {
+      background: #fef08a;
+    }
+
+    .util-btn.sound-off {
+      background: #e2e8f0;
+      color: #64748b;
+    }
+
+    .preset-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .preset-chip {
+      border: 2px solid #1e293b;
+      border-radius: 999px;
+      background: #ffffff;
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #0f172a;
+      cursor: pointer;
+      transition: background 0.12s ease, transform 0.08s ease;
+    }
+
+    .preset-chip:hover {
+      background: #fde047;
+      transform: translateY(-1px);
+    }
+
+    /* Shake animation on invalid press */
+    @keyframes btnShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    .btn-shake {
+      animation: btnShake 0.28s ease;
+    }
+
+    /* Prominent PWA Install App button (shown when Chrome Android supports WebAPK install) */
+    .install-banner-btn {
+      display: none;
+      width: 100%;
+      border: 2.5px solid #1e293b;
+      border-radius: var(--radius-md);
+      padding: 8px 10px;
+      background: linear-gradient(135deg, #fde047, #f59e0b);
+      color: #0f172a;
+      font-size: 0.88rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 3px 0 rgba(15, 23, 42, 0.2);
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .install-banner-btn.show {
+      display: flex;
+    }
+
+    .install-banner-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.25);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- LEFT 75% STAGE -->
+    <main class="stage-pane">
+      <canvas id="stageCanvas"></canvas>
+
+      <div class="hud-top">
+        <div class="hud-number-card">
+          <div class="hud-value-row">
+            <span class="hud-value" id="hudValue">1</span>
+            <span class="hud-short-unit" id="hudShortUnit">1 đơn vị</span>
+          </div>
+          <div class="hud-vietnamese" id="hudVietnamese">Một</div>
+        </div>
+
+        <div class="hud-scale-card">
+          <div class="hud-scene-badge" id="hudSceneBadge">Cấp 1 / 8</div>
+          <div class="hud-scale-title" id="hudSceneTitle">Bãi cỏ cận cảnh</div>
+          <div class="hud-scale-desc" id="hudSceneCompare">Nhỏ bằng 1 quả cam (~8 cm)</div>
+        </div>
+      </div>
+
+      <div class="speech-bubble" id="speechBubble"></div>
+
+      <div class="hud-bottom">
+        <div class="structure-pill" id="structurePill">
+          Cấu tạo: 1 khối đỏ đơn vị
+        </div>
+        <div class="size-pill" id="sizePill">
+          Chiều cao ước tính: ~8 cm
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT 25% SIDEBAR -->
+    <aside class="sidebar-pane">
+      <div class="sidebar-header">
+        <div class="logo-title" id="logoTitle">NUMBERBLOCKS</div>
+        <div class="logo-sub">Biến hóa con số từ quả cam đến vũ trụ!</div>
+      </div>
+
+      <button class="install-banner-btn" id="btnInstallPwa" type="button">
+        <span>📲</span>
+        <span>Cài App lên Máy tính bảng</span>
+      </button>
+
+      <div class="equation-box" id="equationBox">
+        Bắt đầu từ số 1
+      </div>
+
+      <section class="op-section">
+        <div class="op-section-title">
+          <span>Cộng &amp; Trừ</span>
+          <span style="color:#64748b;">Thêm / Bớt block</span>
+        </div>
+        <div class="op-grid">
+          <button class="op-btn btn-add" data-op="add" data-val="1">+ 1</button>
+          <button class="op-btn btn-sub" data-op="sub" data-val="1">- 1</button>
+          <button class="op-btn btn-sub" data-op="sub" data-val="2">- 2</button>
+          <button class="op-btn btn-sub" data-op="sub" data-val="3">- 3</button>
+          <button class="op-btn btn-add" data-op="add" data-val="100">+ 100</button>
+          <button class="op-btn btn-sub" data-op="sub" data-val="100">- 100</button>
+          <button class="op-btn btn-add" data-op="add" data-val="1000">+ 1000</button>
+          <button class="op-btn btn-sub" data-op="sub" data-val="1000">- 1000</button>
+        </div>
+      </section>
+
+      <section class="op-section">
+        <div class="op-section-title">
+          <span>Nhân &amp; Chia</span>
+          <span style="color:#64748b;">Gấp lần / Chia đều</span>
+        </div>
+        <div class="op-grid">
+          <button class="op-btn btn-mul" data-op="mul" data-val="2">&times; 2</button>
+          <button class="op-btn btn-div" data-op="div" data-val="2">&divide; 2</button>
+          <button class="op-btn btn-mul" data-op="mul" data-val="3">&times; 3</button>
+          <button class="op-btn btn-div" data-op="div" data-val="3">&divide; 3</button>
+          <button class="op-btn btn-mul" data-op="mul" data-val="5">&times; 5</button>
+          <button class="op-btn btn-div" data-op="div" data-val="5">&divide; 5</button>
+          <button class="op-btn btn-mul" data-op="mul" data-val="7">&times; 7</button>
+          <button class="op-btn btn-div" data-op="div" data-val="7">&divide; 7</button>
+          <button class="op-btn btn-mul" data-op="mul" data-val="10">&times; 10</button>
+          <button class="op-btn btn-div" data-op="div" data-val="10">&divide; 10</button>
+        </div>
+      </section>
+
+      <section class="op-section">
+        <div class="op-section-title"><span>Điều khiển</span></div>
+        <div class="util-row">
+          <button class="util-btn reset" id="btnReset">↺ Về 1</button>
+          <button class="util-btn" id="btnUndo">↶ Lùi</button>
+          <button class="util-btn" id="btnSound">🔊 Loa</button>
+          <button class="util-btn" id="btnFullscreen">⛶ Đầy</button>
+        </div>
+      </section>
+
+      <section class="op-section">
+        <div class="op-section-title">
+          <span>Khám phá nhanh</span>
+          <span style="color:#64748b;">Bấm thử!</span>
+        </div>
+        <div class="preset-wrap">
+          <button class="preset-chip" data-preset="1">1</button>
+          <button class="preset-chip" data-preset="7">7 (Cầu vồng)</button>
+          <button class="preset-chip" data-preset="9">9 (Xám)</button>
+          <button class="preset-chip" data-preset="15">15</button>
+          <button class="preset-chip" data-preset="20">20</button>
+          <button class="preset-chip" data-preset="25">25</button>
+          <button class="preset-chip" data-preset="100">100</button>
+          <button class="preset-chip" data-preset="155">155</button>
+          <button class="preset-chip" data-preset="200">200</button>
+          <button class="preset-chip" data-preset="1000">1,000</button>
+          <button class="preset-chip" data-preset="10000">10,000</button>
+          <button class="preset-chip" data-preset="1000000000">1 Tỉ</button>
+          <button class="preset-chip" data-preset="1000000000000000000">1 Tỉ tỉ</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <div class="rotate-hint" id="rotateHint">
+    <span>📱 Xoay ngang máy tính bảng để chơi đẹp nhất nhé!</span>
+    <button type="button" id="btnDismissRotate">Đã hiểu</button>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // 1. COLOR CONVENTIONS (Quy_uoc_mau.rtf & Character_Sheet/numbers_block.jpeg)
+      // =========================================================================
+      // Base colors for units 1..9 & 10, plus lighter (pastel) colors for tens/hundreds/higher tiers
+      const DIGIT_COLORS = {
+        1: { main: '#EE1C25', light: '#F88388', border: '#991B1B', arm: '#EE1C25', name: 'đỏ' },
+        2: { main: '#F7941D', light: '#FBB867', border: '#9A3412', arm: '#F7941D', name: 'cam' },
+        3: { main: '#FFF200', light: '#FFF78A', border: '#A16207', arm: '#EAB308', name: 'vàng' },
+        4: { main: '#39B54A', light: '#86D993', border: '#166534', arm: '#39B54A', name: 'xanh lá' },
+        5: { main: '#00AEEF', light: '#7AD7F9', border: '#075985', arm: '#00AEEF', name: 'xanh lơ' },
+        6: { main: '#4B3899', light: '#9B8CD9', border: '#2E1065', arm: '#4B3899', name: 'chàm' },
+        7: { main: '#A855F7', light: '#D8B4FE', border: '#581C87', arm: '#A855F7', name: 'cầu vồng' },
+        8: { main: '#EC008C', light: '#F785C8', border: '#831843', arm: '#EC008C', name: 'hồng cánh sen' },
+        9: { main: '#9CA3AF', light: '#D1D5DB', border: '#374151', arm: '#6B7280', name: 'xám' },
+      };
+
+      // Rainbow 7 colors from bottom (index 0) to top (index 6)
+      const RAINBOW_MAIN = [
+        '#EE1C25', // Đỏ
+        '#F7941D', // Cam
+        '#FFF200', // Vàng
+        '#39B54A', // Xanh lá
+        '#00AEEF', // Xanh lơ
+        '#4B3899', // Chàm
+        '#9333EA'  // Tím
+      ];
+      const RAINBOW_LIGHT = [
+        '#F88388',
+        '#FBB867',
+        '#FFF78A',
+        '#86D993',
+        '#7AD7F9',
+        '#9B8CD9',
+        '#C084FC'
+      ];
+
+      // 3 grey levels from bottom to top getting darker
+      const GREY_MAIN = ['#D1D5DB', '#9CA3AF', '#6B7280'];
+      const GREY_LIGHT = ['#E5E7EB', '#CBD5E1', '#94A3B8'];
+
+      // Helper to shade hex color
+      function shadeHex(hex, percent) {
+        const clean = hex.replace('#', '');
+        const num = parseInt(clean, 16);
+        let r = (num >> 16) + Math.round(2.55 * percent);
+        let g = ((num >> 8) & 0x00FF) + Math.round(2.55 * percent);
+        let b = (num & 0x0000FF) + Math.round(2.55 * percent);
+        r = Math.max(0, Math.min(255, r));
+        g = Math.max(0, Math.min(255, g));
+        b = Math.max(0, Math.min(255, b));
+        return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+      }
+
+      // Rainbow title styling
+      (function colorizeLogo() {
+        const el = document.getElementById('logoTitle');
+        const txt = el.textContent;
+        const palette = ['#EE1C25', '#F7941D', '#FACC15', '#39B54A', '#00AEEF', '#6366F1', '#EC008C'];
+        el.innerHTML = txt.split('').map((ch, i) =>
+          `<span style="color:${palette[i % palette.length]}">${ch}</span>`
+        ).join('');
+      })();
+
+      // =========================================================================
+      // 2. BIGINT MATH, VIETNAMESE READING & SCALE LOGIC
+      // =========================================================================
+      const MAX_VALUE = 10n ** 27n; // 1,000 tỉ tỉ tỉ
+
+      function formatBigInt(n) {
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
+
+      const VN_DIGITS = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
+
+      function readThreeDigitsVN(num, hasHigher) {
+        const hundreds = Math.floor(num / 100);
+        const tens = Math.floor((num % 100) / 10);
+        const ones = num % 10;
+        const parts = [];
+
+        if (hundreds > 0 || hasHigher) {
+          parts.push(VN_DIGITS[hundreds] + ' trăm');
+        }
+        if (tens === 0) {
+          if (ones > 0 && (hundreds > 0 || hasHigher)) {
+            parts.push('linh');
+          }
+        } else if (tens === 1) {
+          parts.push('mười');
+        } else {
+          parts.push(VN_DIGITS[tens] + ' mươi');
+        }
+
+        if (ones > 0) {
+          if (ones === 1 && tens >= 2) {
+            parts.push('mốt');
+          } else if (ones === 4 && tens >= 2) {
+            parts.push('tư');
+          } else if (ones === 5 && tens >= 1) {
+            parts.push('lăm');
+          } else {
+            parts.push(VN_DIGITS[ones]);
+          }
+        }
+        return parts.join(' ');
+      }
+
+      function readUpTo999MillionVN(chunkStr, hasHigher) {
+        const n = parseInt(chunkStr, 10);
+        if (n === 0) return '';
+        const millions = Math.floor(n / 1000000);
+        const thousands = Math.floor((n % 1000000) / 1000);
+        const units = n % 1000;
+        const parts = [];
+
+        if (millions > 0) {
+          parts.push(readThreeDigitsVN(millions, hasHigher) + ' triệu');
+        }
+        if (thousands > 0) {
+          parts.push(readThreeDigitsVN(thousands, hasHigher || millions > 0) + ' nghìn');
+        }
+        if (units > 0) {
+          parts.push(readThreeDigitsVN(units, hasHigher || millions > 0 || thousands > 0));
+        }
+        return parts.join(' ');
+      }
+
+      function bigIntToVietnamese(n) {
+        if (n === 0n) return 'Không';
+        const s = n.toString();
+        // Split into 9-digit chunks from right to left (each chunk is a power of 10^9 = "tỉ")
+        const chunks = [];
+        for (let i = s.length; i > 0; i -= 9) {
+          chunks.unshift(s.slice(Math.max(0, i - 9), i));
+        }
+
+        const out = [];
+        let seenHigher = false;
+        for (let idx = 0; idx < chunks.length; idx++) {
+          const val = parseInt(chunks[idx], 10);
+          const tiPow = chunks.length - 1 - idx;
+          if (val > 0) {
+            const text = readUpTo999MillionVN(chunks[idx], seenHigher);
+            const tiSuffix = tiPow > 0 ? ' ' + Array(tiPow).fill('tỉ').join(' ') : '';
+            out.push(text + tiSuffix);
+            seenHigher = true;
+          }
+        }
+        const raw = out.join(' ').trim();
+        return raw.charAt(0).toUpperCase() + raw.slice(1);
+      }
+
+      function getShortVietnameseUnit(n) {
+        const s = n.toString();
+        const len = s.length;
+        if (len <= 3) return n.toString() + ' đơn vị';
+        if (len <= 6) return (Number(n / 100n) / 10).toLocaleString('en-US') + ' nghìn';
+        if (len <= 9) return (Number(n / 100000n) / 10).toLocaleString('en-US') + ' triệu';
+        if (len <= 12) return (Number(n / 100000000n) / 10).toLocaleString('en-US') + ' tỉ';
+        if (len <= 15) return (Number(n / 100000000000n) / 10).toLocaleString('en-US') + ' nghìn tỉ';
+        if (len <= 18) return (Number(n / 100000000000000n) / 10).toLocaleString('en-US') + ' triệu tỉ';
+        if (len <= 21) return (Number(n / 100000000000000000n) / 10).toLocaleString('en-US') + ' tỉ tỉ';
+        if (len <= 24) return (Number(n / (10n ** 20n)) / 10).toLocaleString('en-US') + ' nghìn tỉ tỉ';
+        return (Number(n / (10n ** 23n)) / 10).toLocaleString('en-US') + ' triệu tỉ tỉ';
+      }
+
+      function getLog10Approx(n) {
+        const s = n.toString();
+        if (s.length <= 12) return Math.log10(Number(n));
+        const head = parseFloat(s.slice(0, 6)) / 100000;
+        return (s.length - 1) + Math.log10(head);
+      }
+
+      function estimateHeightText(n) {
+        // 1 block = ~8 cm (size of an orange)
+        const logMeters = getLog10Approx(n) + Math.log10(0.08);
+        if (logMeters < 0) {
+          const cm = Math.round(Math.pow(10, logMeters) * 100);
+          return `~${cm} cm`;
+        }
+        if (logMeters < 3) {
+          const m = Math.pow(10, logMeters);
+          return `~${m < 10 ? m.toFixed(1) : Math.round(m).toLocaleString('en-US')} m`;
+        }
+        if (logMeters < 9) {
+          const km = Math.pow(10, logMeters - 3);
+          return `~${km < 10 ? km.toFixed(1) : Math.round(km).toLocaleString('en-US')} km`;
+        }
+        if (logMeters < 15) {
+          const milKm = Math.pow(10, logMeters - 9);
+          return `~${milKm < 10 ? milKm.toFixed(1) : Math.round(milKm).toLocaleString('en-US')} triệu km`;
+        }
+        const ly = Math.pow(10, logMeters) / 9.461e15;
+        if (ly < 1) {
+          return `~${Math.round(Math.pow(10, logMeters - 12)).toLocaleString('en-US')} tỉ km`;
+        }
+        if (ly < 1e6) {
+          return `~${ly < 10 ? ly.toFixed(2) : Math.round(ly).toLocaleString('en-US')} năm ánh sáng`;
+        }
+        const mly = ly / 1e6;
+        return `~${mly < 10 ? mly.toFixed(1) : Math.round(mly).toLocaleString('en-US')} triệu năm ánh sáng`;
+      }
+
+      // 8 World Scale Tiers
+      const WORLD_TIERS = [
+        {
+          id: 0, minLog: 0, maxLog: 1, // 1 .. 9
+          badge: 'Cấp 1 / 8',
+          title: 'Bãi cỏ cận cảnh',
+          compare: 'Nhỏ từ quả cam, viên sỏi đến ngọn cỏ xanh'
+        },
+        {
+          id: 1, minLog: 1, maxLog: 2, // 10 .. 99
+          badge: 'Cấp 2 / 8',
+          title: 'Khu vườn & Sân chơi',
+          compare: 'Cao bằng chú mèo, xe đạp, cây táo & ngôi nhà'
+        },
+        {
+          id: 2, minLog: 2, maxLog: 3, // 100 .. 999
+          badge: 'Cấp 3 / 8',
+          title: 'Đường phố & Đô thị',
+          compare: 'To lớn ngang xe buýt & tòa nhà cao tầng'
+        },
+        {
+          id: 3, minLog: 3, maxLog: 5, // 1,000 .. 99,999
+          badge: 'Cấp 4 / 8',
+          title: 'Núi cao & Bầu trời',
+          compare: 'Vươn tới khinh khí cầu, máy bay & đỉnh Everest'
+        },
+        {
+          id: 4, minLog: 5, maxLog: 7, // 100,000 .. 9,999,999
+          badge: 'Cấp 5 / 8',
+          title: 'Quỹ đạo Trái Đất',
+          compare: 'Nhìn thấy đường cong đại dương & trạm vũ trụ'
+        },
+        {
+          id: 5, minLog: 7, maxLog: 10, // 10^7 .. 9.99 * 10^9
+          badge: 'Cấp 6 / 8',
+          title: 'Hệ Mặt Trời',
+          compare: 'Sánh vai cùng Trái Đất, Sao Thổ & Mặt Trời'
+        },
+        {
+          id: 6, minLog: 10, maxLog: 15, // 10^10 .. 9.99 * 10^14
+          badge: 'Cấp 7 / 8',
+          title: 'Dải Ngân Hà',
+          compare: 'Khổng lồ ngang tinh vân & cánh tay thiên hà'
+        },
+        {
+          id: 7, minLog: 15, maxLog: 28, // 10^15+ (Triệu tỉ, Tỉ tỉ+)
+          badge: 'Cấp 8 / 8',
+          title: 'Vũ trụ bao la (Tỉ tỉ)',
+          compare: 'Hàng loạt thiên hà nhỏ như hạt bụi dưới chân!'
+        }
+      ];
+
+      function getWorldTier(n) {
+        if (n < 10n) return WORLD_TIERS[0];
+        if (n < 100n) return WORLD_TIERS[1];
+        if (n < 1000n) return WORLD_TIERS[2];
+        if (n < 100000n) return WORLD_TIERS[3];
+        if (n < 10000000n) return WORLD_TIERS[4];
+        if (n < 10000000000n) return WORLD_TIERS[5];
+        if (n < 1000000000000000n) return WORLD_TIERS[6];
+        return WORLD_TIERS[7];
+      }
+
+      // =========================================================================
+      // 3. RECURSIVE CHARACTER GEOMETRY ENGINE (Quy_uoc_mau.rtf)
+      // =========================================================================
+      /**
+       * Resolves block colors for a place digit (1..9) and its 3D coordinates.
+       * placeInTier: 0 = units (10^0 of tier), 1 = tens (10^1 of tier), 2 = hundreds (10^2 of tier)
+       * tierIndex: 0 = 1..999, 1 = 10^3..999*10^3, 2 = 10^6...
+       */
+      function getCellStyle(digit, placeInTier, tierIndex, ix, iy, iz, cols, rows, depth) {
+        // Special rule: 10 (digit=1, placeInTier=1) -> White with red border!
+        if (digit === 1 && placeInTier === 1) {
+          return {
+            front: '#FFFFFF',
+            top: '#FEE2E2',
+            side: '#FCA5A5',
+            border: '#EE1C25',
+            subGridColor: tierIndex > 0 ? 'rgba(238, 28, 37, 0.35)' : null
+          };
+        }
+
+        // Special rule: 1000-cube (digit=1, placeInTier=0, tierIndex>=1) -> White front, Red other faces!
+        if (digit === 1 && placeInTier === 0 && tierIndex >= 1) {
+          return {
+            front: '#FFFFFF',
+            top: '#EF4444',
+            side: '#DC2626',
+            border: '#991B1B',
+            subGridColor: 'rgba(238, 28, 37, 0.45)'
+          };
+        }
+
+        // Determine whether to use pastel (light) or base (main) color:
+        // - Units (placeInTier === 0, tierIndex === 0): main vibrant color
+        // - Units of higher tier >= 1 (e.g. 2000..9000): main color so 2000 is bright orange, 7000 is rainbow!
+        // - Tens (d=2..9) and Hundreds (d=1..9): light pastel color per Quy_uoc_mau.rtf
+        const useLight = placeInTier >= 1;
+        let baseHex;
+
+        if (digit === 7) {
+          const palette = useLight ? RAINBOW_LIGHT : RAINBOW_MAIN;
+          if (placeInTier === 0) {
+            // Vertical rainbow bottom-to-top
+            baseHex = palette[iy % 7];
+          } else if (placeInTier === 1) {
+            // 70: 7 columns rainbow left-to-right (or 7 rows)
+            baseHex = palette[ix % 7];
+          } else {
+            // 700: 7 depth layers rainbow front-to-back
+            baseHex = palette[iz % 7];
+          }
+        } else if (digit === 9) {
+          const palette = useLight ? GREY_LIGHT : GREY_MAIN;
+          // 3 clusters from bottom to top getting darker
+          const band = Math.min(2, Math.floor((iy / Math.max(1, rows)) * 3));
+          baseHex = palette[band];
+        } else {
+          const info = DIGIT_COLORS[digit];
+          baseHex = useLight ? info.light : info.main;
+        }
+
+        const border = DIGIT_COLORS[digit] ? DIGIT_COLORS[digit].border : '#334155';
+        return {
+          front: baseHex,
+          top: shadeHex(baseHex, 14),
+          side: shadeHex(baseHex, -16),
+          border: border,
+          subGridColor: tierIndex > 0 ? 'rgba(15, 23, 42, 0.22)' : null
+        };
+      }
+
+      /**
+       * Builds visual modules for a 3-digit tier chunk (1..999) at linear scale `scale`.
+       * Per Quy_uoc_mau.rtf:
+       * - Hundreds (100..900): 10 cols x 10 rows x d depth
+       * - Tens (10..90): d cols x 10 rows x 1 depth (10 is white w/ red border, 20..90 pastel)
+       * - Units (1..9): 1 col x d rows x 1 depth (bottom-aligned at y=0)
+       * All modules sit seamlessly touching from Left to Right!
+       */
+      function buildTierModules(chunkVal, tierIndex, scale) {
+        const hundreds = Math.floor(chunkVal / 100);
+        const tens = Math.floor((chunkVal % 100) / 10);
+        const units = chunkVal % 10;
+        const mods = [];
+
+        if (hundreds > 0) {
+          mods.push({
+            digit: hundreds,
+            placeInTier: 2,
+            tierIndex,
+            cols: 10,
+            rows: 10,
+            depth: hundreds,
+            scale
+          });
+        }
+        if (tens > 0) {
+          mods.push({
+            digit: tens,
+            placeInTier: 1,
+            tierIndex,
+            cols: tens,
+            rows: 10,
+            depth: 1,
+            scale
+          });
+        }
+        if (units > 0) {
+          mods.push({
+            digit: units,
+            placeInTier: 0,
+            tierIndex,
+            cols: 1,
+            rows: units,
+            depth: 1,
+            scale
+          });
+        }
+        return mods;
+      }
+
+      /**
+       * Builds the complete single-character model for any BigInt n >= 1.
+       */
+      function buildCharacterModel(n) {
+        const s = n.toString();
+        const groups = []; // groups[0] = 10^0..10^2, groups[1] = 10^3..10^5, ...
+        for (let i = s.length; i > 0; i -= 3) {
+          groups.push(parseInt(s.slice(Math.max(0, i - 3), i), 10));
+        }
+        const topTier = groups.length - 1;
+        const modules = [];
+
+        // Primary tier at scale 1.0
+        modules.push(...buildTierModules(groups[topTier], topTier, 1.0));
+
+        // Adjacent lower tier (T - 1) at exact 0.1 linear scale, seamlessly joined to the right!
+        if (topTier >= 1 && groups[topTier - 1] > 0) {
+          modules.push(...buildTierModules(groups[topTier - 1], topTier - 1, 0.1));
+        }
+
+        // Check if even smaller tiers (< topTier - 1) have non-zero remainder for magnifying callout
+        let tinyRemainder = 0n;
+        if (topTier >= 2) {
+          const factor = 1000n ** BigInt(topTier - 1);
+          tinyRemainder = n % factor;
+        }
+
+        // Compute normalized X offsets so all modules touch horizontally on y = 0, z = 0
+        let cursorX = 0;
+        let maxH = 0;
+        let maxD = 0;
+        for (const m of modules) {
+          m.x0 = cursorX;
+          m.w = m.cols * m.scale;
+          m.h = m.rows * m.scale;
+          m.d = m.depth * m.scale;
+          cursorX += m.w;
+          if (m.h > maxH) maxH = m.h;
+          if (m.d > maxD) maxD = m.d;
+        }
+
+        return {
+          n,
+          topTier,
+          modules,
+          totalW: cursorX,
+          totalH: maxH,
+          totalD: maxD,
+          tinyRemainder,
+          structureText: describeStructure(n, groups, topTier)
+        };
+      }
+
+      function describeStructure(n, groups, topTier) {
+        if (n < 10n) {
+          const d = Number(n);
+          return `1 cột ${d} khối màu ${DIGIT_COLORS[d].name}`;
+        }
+        if (n === 10n) return '1 cột 10 khối màu trắng viền đỏ';
+        if (n < 100n) {
+          const t = Math.floor(Number(n) / 10);
+          const u = Number(n) % 10;
+          const tColor = t === 1 ? 'trắng viền đỏ' : `${DIGIT_COLORS[t].name} nhạt`;
+          return u === 0
+            ? `${t} cột × 10 khối (${tColor})`
+            : `${t} cột 10 (${tColor}) + ${u} khối ${DIGIT_COLORS[u].name}`;
+        }
+        if (n === 100n) return 'Mảng 10×10 khối màu đỏ nhạt';
+        if (n < 1000n) {
+          const h = Math.floor(Number(n) / 100);
+          const rest = Number(n) % 100;
+          const hColor = `${DIGIT_COLORS[h].name} nhạt`;
+          const base = h === 1 ? `Mảng 10×10 (${hColor})` : `Khối 3D 10×10×${h} (${hColor})`;
+          return rest === 0 ? base : `${base} + khối ${rest} dính liền`;
+        }
+        if (n === 1000n) return 'Khối lập phương 10×10×10 (mặt trước trắng, mặt bên đỏ)';
+        const unitLabel = topTier === 1 ? 'nghìn' : topTier === 2 ? 'triệu' : topTier === 3 ? 'tỉ' : `10^${topTier * 3}`;
+        return `Tổ hợp đệ quy bậc ${unitLabel} (Chu kỳ Cao × Rộng × Sâu)`;
+      }
+
+      // =========================================================================
+      // 4. WEB AUDIO SOUND SYNTHESIZER (Zero external assets)
+      // =========================================================================
+      const SoundFX = {
+        enabled: true,
+        ctx: null,
+        ensureCtx() {
+          if (!this.enabled) return null;
+          if (!this.ctx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) this.ctx = new AC();
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+          return this.ctx;
+        },
+        playTone(freqStart, freqEnd, duration, type = 'sine', vol = 0.14, delay = 0) {
+          const ctx = this.ensureCtx();
+          if (!ctx) return;
+          const now = ctx.currentTime + delay;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freqStart, now);
+          osc.frequency.exponentialRampToValueAtTime(Math.max(40, freqEnd), now + duration);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(vol, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + duration + 0.02);
+        },
+        playAdd() {
+          this.playTone(360, 620, 0.14, 'triangle', 0.16);
+          this.playTone(540, 810, 0.12, 'sine', 0.1, 0.06);
+        },
+        playMultiply() {
+          this.playTone(330, 520, 0.12, 'triangle', 0.14, 0);
+          this.playTone(440, 660, 0.12, 'triangle', 0.14, 0.06);
+          this.playTone(660, 990, 0.18, 'sine', 0.15, 0.12);
+        },
+        playSubtract() {
+          this.playTone(540, 290, 0.15, 'triangle', 0.15);
+        },
+        playDivide() {
+          this.playTone(660, 440, 0.11, 'sine', 0.13, 0);
+          this.playTone(440, 280, 0.14, 'triangle', 0.13, 0.07);
+        },
+        playLevelUp() {
+          const notes = [523.25, 659.25, 783.99, 1046.5];
+          notes.forEach((f, idx) => {
+            this.playTone(f, f * 1.02, 0.18, 'triangle', 0.14, idx * 0.07);
+          });
+        },
+        playError() {
+          this.playTone(220, 170, 0.14, 'sawtooth', 0.09, 0);
+          this.playTone(170, 130, 0.18, 'sawtooth', 0.09, 0.12);
+        }
+      };
+
+      // =========================================================================
+      // 5. GAME STATE & ANIMATION SYSTEM
+      // =========================================================================
+      const state = {
+        value: 1n,
+        history: [],
+        model: null,
+        tier: WORLD_TIERS[0],
+
+        // Smooth camera / animation properties
+        animLogScale: 0,
+        targetLogScale: 0,
+        tierFade: 1,
+        prevTierId: 0,
+
+        // Character bounce & expression
+        scaleBounce: 1,
+        bounceVel: 0,
+        shakeOffset: 0,
+        shakeTimer: 0,
+        expression: 'happy', // 'happy' | 'laugh' | 'surprised' | 'confused'
+        exprTimer: 0,
+        blinkTimer: 2.5,
+        isBlinking: false,
+
+        // Particles & floating blocks
+        stars: [],
+        flyingBlocks: [],
+        floatingText: null,
+        speechTimer: null
+      };
+
+      state.model = buildCharacterModel(1n);
+
+      // Canvas setup
+      const canvas = document.getElementById('stageCanvas');
+      const ctx = canvas.getContext('2d');
+      if (!CanvasRenderingContext2D.prototype.roundRect) {
+        CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+          const rad = typeof r === 'number' ? r : (Array.isArray(r) ? r[0] : 0);
+          const rr = Math.min(rad, w / 2, h / 2);
+          this.beginPath();
+          this.moveTo(x + rr, y);
+          this.arcTo(x + w, y, x + w, y + h, rr);
+          this.arcTo(x + w, y + h, x, y + h, rr);
+          this.arcTo(x, y + h, x, y, rr);
+          this.arcTo(x, y, x + w, y, rr);
+          this.closePath();
+          return this;
+        };
+      }
+      let dpr = window.devicePixelRatio || 1;
+      let stageW = 800;
+      let stageH = 600;
+
+      function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        dpr = window.devicePixelRatio || 1;
+        stageW = rect.width;
+        stageH = rect.height;
+        canvas.width = Math.round(stageW * dpr);
+        canvas.height = Math.round(stageH * dpr);
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      // =========================================================================
+      // 6. DRAWING HELPERS (3D Isometric Projection + Cartoon Character)
+      // =========================================================================
+      // 3/4 Isometric axes matching Character_Sheet/numbers_block.jpeg
+      const ISO_X = { x: 0.985, y: 0.045 };
+      const ISO_Y = { x: 0, y: -1 };
+      const ISO_Z = { x: 0.42, y: -0.27 };
+
+      function project3D(ox, oy, unitPx, x, y, z) {
+        return {
+          x: ox + (x * ISO_X.x + y * ISO_Y.x + z * ISO_Z.x) * unitPx,
+          y: oy + (x * ISO_X.y + y * ISO_Y.y + z * ISO_Z.y) * unitPx
+        };
+      }
+
+      function drawQuad(p1, p2, p3, p4, fill, stroke, lineWidth = 1.5) {
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.lineTo(p3.x, p3.y);
+        ctx.lineTo(p4.x, p4.y);
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.fill();
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = lineWidth;
+          ctx.lineJoin = 'round';
+          ctx.stroke();
+        }
+      }
+
+      function drawCharacterBlocks(ox, oy, unitPx, model) {
+        // Compute line thickness scaled nicely
+        const baseLW = Math.max(0.9, Math.min(2.6, unitPx * 0.055));
+
+        // Sort modules back-to-front / left-to-right: since modules touch along X from left to right,
+        // and each block is extruded into +Z (up-right), drawing LEFT-TO-RIGHT could make module i+1 cover
+        // module i's right face cleanly! Wait: let's verify!
+        // Module i's right face is at x = x0 + w, z in [0, d]. Module i+1 is at x >= x0 + w!
+        // Because module i+1 sits to the RIGHT of module i, drawing RIGHT-TO-LEFT or LEFT-TO-RIGHT?
+        // Look at Z extrusion (+0.42, -0.27): a face at x = x0+w goes up-right INTO the space occupied by module i+1!
+        // Wait: physically in 3D, module i+1 is closer along the +X axis (to the right), wait: from camera looking slightly from front-right (we see RIGHT face!), right-side objects (+X) are IN FRONT of left-side objects (-X)!
+        // Let's verify: if camera is slightly to the front-right, +X is TOWARD the viewer's right, so module i+1 (larger X) occludes module i's right face where they touch!
+        // So we MUST draw LEFT-TO-RIGHT (`i = 0 .. modules.length - 1`) so module `i+1` properly draws ON TOP of the occluded lower part of module `i`'s right face!
+        for (let mIdx = 0; mIdx < model.modules.length; mIdx++) {
+          const m = model.modules[mIdx];
+          const cellSize = unitPx * m.scale;
+          const lw = Math.max(0.75, Math.min(2.4, cellSize * 0.065));
+
+          // Draw a whole module cell-by-cell on its 3 visible exterior faces:
+          // 1) Back-most visible? Actually for one convex box (cols x rows x depth):
+          //    Front face (z = 0), Top face (y = h), Right face (x = x0 + w) NEVER self-overlap in orthographic projection!
+          //    Wait: even better, draw Top face & Right face & Front face for every exterior grid cell!
+
+          // --- TOP FACE (y = m.h, z goes back-to-front from depth-1 down to 0) ---
+          for (let iz = m.depth - 1; iz >= 0; iz--) {
+            for (let ix = 0; ix < m.cols; ix++) {
+              const style = getCellStyle(m.digit, m.placeInTier, m.tierIndex, ix, m.rows - 1, iz, m.cols, m.rows, m.depth);
+              const x1 = m.x0 + ix * m.scale;
+              const x2 = x1 + m.scale;
+              const z1 = iz * m.scale;
+              const z2 = z1 + m.scale;
+              const y = m.h;
+              const p1 = project3D(ox, oy, unitPx, x1, y, z1);
+              const p2 = project3D(ox, oy, unitPx, x2, y, z1);
+              const p3 = project3D(ox, oy, unitPx, x2, y, z2);
+              const p4 = project3D(ox, oy, unitPx, x1, y, z2);
+              drawQuad(p1, p2, p3, p4, style.top, style.border, lw);
+
+              if (style.subGridColor && cellSize >= 24) {
+                const divs = cellSize >= 48 ? 10 : 5;
+                ctx.save();
+                ctx.strokeStyle = style.top === '#EF4444' ? 'rgba(255,255,255,0.32)' : style.subGridColor;
+                ctx.lineWidth = 0.7;
+                ctx.beginPath();
+                for (let g = 1; g < divs; g++) {
+                  const t = g / divs;
+                  const gx = x1 + (x2 - x1) * t;
+                  const ga = project3D(ox, oy, unitPx, gx, y, z1);
+                  const gb = project3D(ox, oy, unitPx, gx, y, z2);
+                  ctx.moveTo(ga.x, ga.y);
+                  ctx.lineTo(gb.x, gb.y);
+
+                  const gz = z1 + (z2 - z1) * t;
+                  const gc = project3D(ox, oy, unitPx, x1, y, gz);
+                  const gd = project3D(ox, oy, unitPx, x2, y, gz);
+                  ctx.moveTo(gc.x, gc.y);
+                  ctx.lineTo(gd.x, gd.y);
+                }
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+          }
+
+          // --- RIGHT FACE (x = m.x0 + m.w) ---
+          for (let iz = m.depth - 1; iz >= 0; iz--) {
+            for (let iy = 0; iy < m.rows; iy++) {
+              const style = getCellStyle(m.digit, m.placeInTier, m.tierIndex, m.cols - 1, iy, iz, m.cols, m.rows, m.depth);
+              const x = m.x0 + m.w;
+              const y1 = iy * m.scale;
+              const y2 = y1 + m.scale;
+              const z1 = iz * m.scale;
+              const z2 = z1 + m.scale;
+              const p1 = project3D(ox, oy, unitPx, x, y1, z1);
+              const p2 = project3D(ox, oy, unitPx, x, y1, z2);
+              const p3 = project3D(ox, oy, unitPx, x, y2, z2);
+              const p4 = project3D(ox, oy, unitPx, x, y2, z1);
+              drawQuad(p1, p2, p3, p4, style.side, style.border, lw);
+
+              if (style.subGridColor && cellSize >= 24) {
+                const divs = cellSize >= 48 ? 10 : 5;
+                ctx.save();
+                ctx.strokeStyle = style.side === '#DC2626' ? 'rgba(255,255,255,0.28)' : style.subGridColor;
+                ctx.lineWidth = 0.7;
+                ctx.beginPath();
+                for (let g = 1; g < divs; g++) {
+                  const t = g / divs;
+                  const gy = y1 + (y2 - y1) * t;
+                  const ga = project3D(ox, oy, unitPx, x, gy, z1);
+                  const gb = project3D(ox, oy, unitPx, x, gy, z2);
+                  ctx.moveTo(ga.x, ga.y);
+                  ctx.lineTo(gb.x, gb.y);
+
+                  const gz = z1 + (z2 - z1) * t;
+                  const gc = project3D(ox, oy, unitPx, x, y1, gz);
+                  const gd = project3D(ox, oy, unitPx, x, y2, gz);
+                  ctx.moveTo(gc.x, gc.y);
+                  ctx.lineTo(gd.x, gd.y);
+                }
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+          }
+
+          // --- FRONT FACE (z = 0) ---
+          for (let iy = 0; iy < m.rows; iy++) {
+            for (let ix = 0; ix < m.cols; ix++) {
+              const style = getCellStyle(m.digit, m.placeInTier, m.tierIndex, ix, iy, 0, m.cols, m.rows, m.depth);
+              const x1 = m.x0 + ix * m.scale;
+              const x2 = x1 + m.scale;
+              const y1 = iy * m.scale;
+              const y2 = y1 + m.scale;
+              const p1 = project3D(ox, oy, unitPx, x1, y1, 0);
+              const p2 = project3D(ox, oy, unitPx, x2, y1, 0);
+              const p3 = project3D(ox, oy, unitPx, x2, y2, 0);
+              const p4 = project3D(ox, oy, unitPx, x1, y2, 0);
+              drawQuad(p1, p2, p3, p4, style.front, style.border, lw);
+
+              // Subtle top-left bevel highlight on each block (when cell >= 10px)
+              if (cellSize >= 12) {
+                ctx.beginPath();
+                ctx.moveTo(p4.x + 2, p4.y + 2);
+                ctx.lineTo(p3.x - 2, p3.y + 2);
+                ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+                ctx.lineWidth = Math.max(1, lw * 0.8);
+                ctx.stroke();
+              }
+
+              // For tier >= 1 cubes (1,000-cube, 1,000,000-cube...), draw subtle 10x10 inner grid lines
+              if (style.subGridColor && cellSize >= 24) {
+                const divs = cellSize >= 48 ? 10 : 5;
+                ctx.save();
+                ctx.strokeStyle = style.subGridColor;
+                ctx.lineWidth = 0.7;
+                ctx.beginPath();
+                for (let g = 1; g < divs; g++) {
+                  const t = g / divs;
+                  const gx1 = x1 + (x2 - x1) * t;
+                  const gpA = project3D(ox, oy, unitPx, gx1, y1, 0);
+                  const gpB = project3D(ox, oy, unitPx, gx1, y2, 0);
+                  ctx.moveTo(gpA.x, gpA.y);
+                  ctx.lineTo(gpB.x, gpB.y);
+
+                  const gy1 = y1 + (y2 - y1) * t;
+                  const gpC = project3D(ox, oy, unitPx, x1, gy1, 0);
+                  const gpD = project3D(ox, oy, unitPx, x2, gy1, 0);
+                  ctx.moveTo(gpC.x, gpC.y);
+                  ctx.lineTo(gpD.x, gpD.y);
+                }
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+          }
+        }
+      }
+
+      // Draw cartoon arm with white glove matching numbers_block.jpeg
+      function drawArm(x, y, sideSign, armLen, color, waveAngle) {
+        ctx.save();
+        ctx.translate(x, y);
+        const thickness = Math.max(5, Math.min(16, armLen * 0.14));
+        const endX = sideSign * armLen * Math.cos(waveAngle);
+        const endY = armLen * Math.sin(waveAngle);
+        const ctrlX = sideSign * armLen * 0.55;
+        const ctrlY = armLen * 0.25 + (waveAngle < 0 ? -armLen * 0.15 : armLen * 0.18);
+
+        // Dark outer outline
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = thickness + 4;
+        ctx.stroke();
+
+        // Inner colored arm
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = thickness;
+        ctx.stroke();
+
+        // White cartoon glove
+        const gloveR = Math.max(8, thickness * 1.42);
+        ctx.translate(endX, endY);
+        ctx.rotate(waveAngle * sideSign * 0.4);
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 2.2;
+
+        // Cuff
+        ctx.beginPath();
+        ctx.ellipse(0, 0, gloveR * 0.85, gloveR * 0.65, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Palm + puffy fingers
+        ctx.beginPath();
+        ctx.arc(sideSign * gloveR * 0.55, 0, gloveR * 0.95, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Thumb
+        ctx.beginPath();
+        ctx.arc(sideSign * gloveR * 0.25, -gloveR * 0.82, gloveR * 0.46, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Finger detail lines
+        ctx.beginPath();
+        ctx.moveTo(sideSign * gloveR * 0.4, -gloveR * 0.28);
+        ctx.lineTo(sideSign * gloveR * 0.95, -gloveR * 0.28);
+        ctx.moveTo(sideSign * gloveR * 0.4, gloveR * 0.22);
+        ctx.lineTo(sideSign * gloveR * 0.95, gloveR * 0.22);
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      // Draw leg + iconic red sneaker with white sole & toe cap
+      function drawLegAndShoe(x, y, legLen, color, facingSign) {
+        ctx.save();
+        ctx.translate(x, y);
+        const legW = Math.max(6, Math.min(16, legLen * 0.36));
+
+        // Leg
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.roundRect(-legW / 2, -2, legW, legLen, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        // Sneaker
+        const shoeW = legW * 2.15;
+        const shoeH = legW * 1.1;
+        const sx = facingSign > 0 ? -shoeW * 0.28 : -shoeW * 0.72;
+        const sy = legLen - shoeH * 0.35;
+
+        // Red shoe upper
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath();
+        ctx.roundRect(sx, sy, shoeW, shoeH, [shoeH * 0.5, shoeH * 0.5, 4, 4]);
+        ctx.fill();
+        ctx.stroke();
+
+        // White toe cap
+        const toeX = facingSign > 0 ? sx + shoeW - shoeW * 0.34 : sx;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.roundRect(toeX, sy + shoeH * 0.28, shoeW * 0.34, shoeH * 0.55, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        // White sole
+        ctx.fillStyle = '#f8fafc';
+        ctx.beginPath();
+        ctx.roundRect(sx - 1, sy + shoeH * 0.72, shoeW + 2, shoeH * 0.34, 3);
+        ctx.fill();
+        ctx.stroke();
+
+        // White laces
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.8;
+        const lx = sx + shoeW * 0.45;
+        ctx.beginPath();
+        ctx.moveTo(lx, sy + shoeH * 0.22);
+        ctx.lineTo(lx + facingSign * 4, sy + shoeH * 0.36);
+        ctx.moveTo(lx, sy + shoeH * 0.42);
+        ctx.lineTo(lx + facingSign * 4, sy + shoeH * 0.54);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      // Draw expressive face (eyes, eyebrows, mouth) on the front face of main module
+      function drawFace(cx, cy, faceSize, expr, isBlinking) {
+        ctx.save();
+        ctx.translate(cx, cy);
+
+        const eyeSep = faceSize * 0.29;
+        const eyeR = Math.max(4.5, faceSize * 0.16);
+        const eyeY = -faceSize * 0.08;
+
+        // Eyebrows
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = Math.max(2, faceSize * 0.055);
+        ctx.lineCap = 'round';
+        [-1, 1].forEach((side) => {
+          const bx = side * eyeSep;
+          ctx.beginPath();
+          if (expr === 'confused') {
+            ctx.moveTo(bx - eyeR * 0.9, eyeY - eyeR * 1.45 + (side < 0 ? 3 : -2));
+            ctx.quadraticCurveTo(bx, eyeY - eyeR * 1.7, bx + eyeR * 0.9, eyeY - eyeR * 1.35 + (side < 0 ? -2 : 3));
+          } else {
+            const lift = expr === 'surprised' ? -eyeR * 0.35 : 0;
+            ctx.moveTo(bx - eyeR * 0.95, eyeY - eyeR * 1.3 + lift);
+            ctx.quadraticCurveTo(bx, eyeY - eyeR * 1.75 + lift, bx + eyeR * 0.95, eyeY - eyeR * 1.3 + lift);
+          }
+          ctx.stroke();
+        });
+
+        // Eyes
+        [-1, 1].forEach((side) => {
+          const ex = side * eyeSep;
+          if (isBlinking || expr === 'laugh') {
+            ctx.beginPath();
+            ctx.arc(ex, eyeY + eyeR * 0.15, eyeR * 0.85, Math.PI * 1.1, Math.PI * 1.9);
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = Math.max(2.2, eyeR * 0.28);
+            ctx.stroke();
+          } else {
+            // White sclera
+            ctx.beginPath();
+            ctx.arc(ex, eyeY, eyeR, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = Math.max(1.6, eyeR * 0.18);
+            ctx.stroke();
+
+            // Warm iris + dark pupil
+            const pupilR = expr === 'surprised' ? eyeR * 0.45 : eyeR * 0.56;
+            ctx.beginPath();
+            ctx.arc(ex, eyeY, pupilR, 0, Math.PI * 2);
+            ctx.fillStyle = '#b45309';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(ex, eyeY, pupilR * 0.62, 0, Math.PI * 2);
+            ctx.fillStyle = '#0f172a';
+            ctx.fill();
+
+            // Catchlight
+            ctx.beginPath();
+            ctx.arc(ex - pupilR * 0.35, eyeY - pupilR * 0.35, Math.max(1.5, pupilR * 0.32), 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+          }
+        });
+
+        // Mouth
+        const mouthY = faceSize * 0.22;
+        const mouthW = faceSize * 0.28;
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = Math.max(2, faceSize * 0.05);
+
+        if (expr === 'surprised') {
+          ctx.beginPath();
+          ctx.ellipse(0, mouthY + 2, mouthW * 0.42, mouthW * 0.54, 0, 0, Math.PI * 2);
+          ctx.fillStyle = '#7f1d1d';
+          ctx.fill();
+          ctx.stroke();
+        } else if (expr === 'confused') {
+          ctx.beginPath();
+          ctx.moveTo(-mouthW * 0.65, mouthY + 4);
+          ctx.quadraticCurveTo(0, mouthY - 4, mouthW * 0.65, mouthY + 4);
+          ctx.stroke();
+        } else {
+          // Big cheerful cartoon smile with tongue (like numbers_block.jpeg)
+          ctx.beginPath();
+          ctx.moveTo(-mouthW, mouthY - 2);
+          ctx.quadraticCurveTo(0, mouthY + mouthW * 0.15, mouthW, mouthY - 2);
+          ctx.quadraticCurveTo(mouthW * 0.85, mouthY + mouthW * 0.95, 0, mouthY + mouthW * 0.95);
+          ctx.quadraticCurveTo(-mouthW * 0.85, mouthY + mouthW * 0.95, -mouthW, mouthY - 2);
+          ctx.closePath();
+          ctx.fillStyle = '#7f1d1d';
+          ctx.fill();
+          ctx.stroke();
+
+          // Tongue
+          ctx.save();
+          ctx.clip();
+          ctx.beginPath();
+          ctx.ellipse(0, mouthY + mouthW * 0.82, mouthW * 0.58, mouthW * 0.36, 0, 0, Math.PI * 2);
+          ctx.fillStyle = '#fb7185';
+          ctx.fill();
+          ctx.restore();
+
+          // Re-stroke mouth rim
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      // Draw rainbow Numberling badge floating on top of the character
+      function drawNumberling(cx, cy, valueStr, radius) {
+        ctx.save();
+        ctx.translate(cx, cy);
+
+        // Rainbow outer ring
+        const grad = ctx.createConicGradient ? ctx.createConicGradient(0, 0, 0) : null;
+        if (grad) {
+          grad.addColorStop(0, '#EE1C25');
+          grad.addColorStop(0.17, '#F7941D');
+          grad.addColorStop(0.33, '#FFF200');
+          grad.addColorStop(0.5, '#39B54A');
+          grad.addColorStop(0.67, '#00AEEF');
+          grad.addColorStop(0.83, '#4B3899');
+          grad.addColorStop(1, '#EC008C');
+          ctx.fillStyle = grad;
+        } else {
+          ctx.fillStyle = '#F7941D';
+        }
+
+        // Text inside badge
+        let label = valueStr;
+        if (valueStr.length > 13) {
+          label = getShortVietnameseUnit(state.value);
+        }
+
+        const pillW = label.length > 5
+          ? Math.max(radius * 2.3, radius * 0.68 * label.length + 14)
+          : radius * 2.15;
+        const pillH = radius * 1.95;
+
+        ctx.beginPath();
+        ctx.roundRect(-pillW / 2 - 4, -pillH / 2 - 4, pillW + 8, pillH + 8, pillH / 2 + 4);
+        ctx.fill();
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // White inner badge
+        ctx.beginPath();
+        ctx.roundRect(-pillW / 2, -pillH / 2, pillW, pillH, pillH / 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.stroke();
+
+        const fontSize = label.length <= 3
+          ? radius * 0.95
+          : Math.max(13, Math.min(radius * 0.78, (pillW * 0.84) / (label.length * 0.56)));
+        ctx.font = `900 ${fontSize}px 'Nunito', 'Segoe UI', sans-serif`;
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, 0, 1);
+
+        ctx.restore();
+      }
+
+      // =========================================================================
+      // 7. 8-TIER WORLD BACKGROUNDS & SCALE REFERENCE PROPS
+      // =========================================================================
+      function drawLabelTag(x, y, text, darkBg = false) {
+        ctx.save();
+        ctx.font = '800 12px "Nunito", "Segoe UI", sans-serif';
+        const tw = ctx.measureText(text).width + 16;
+        ctx.fillStyle = darkBg ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.88)';
+        ctx.strokeStyle = darkBg ? 'rgba(255,255,255,0.5)' : '#1e293b';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.roundRect(x - tw / 2, y - 12, tw, 24, 12);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = darkBg ? '#f8fafc' : '#0f172a';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, x, y);
+        ctx.restore();
+      }
+
+      // Draw a cute reference orange (= 1 block!)
+      function drawOrangeProp(x, groundY, size) {
+        const r = Math.max(8, size * 0.5);
+        const cy = groundY - r;
+        ctx.save();
+        // Shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        ctx.beginPath();
+        ctx.ellipse(x, groundY + 2, r * 0.85, r * 0.25, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Orange body
+        const g = ctx.createRadialGradient(x - r * 0.3, cy - r * 0.3, r * 0.15, x, cy, r);
+        g.addColorStop(0, '#fdba74');
+        g.addColorStop(0.5, '#f97316');
+        g.addColorStop(1, '#c2410c');
+        ctx.fillStyle = g;
+        ctx.strokeStyle = '#7c2d12';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Green leaf
+        ctx.fillStyle = '#22c55e';
+        ctx.strokeStyle = '#14532d';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.ellipse(x + r * 0.28, cy - r * 0.95, r * 0.35, r * 0.16, -0.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawPebbleProp(x, groundY, size) {
+        const w = Math.max(10, size * 0.9);
+        const h = Math.max(6, size * 0.52);
+        ctx.save();
+        ctx.fillStyle = '#94a3b8';
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.ellipse(x, groundY - h * 0.45, w * 0.5, h * 0.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#cbd5e1';
+        ctx.beginPath();
+        ctx.ellipse(x - w * 0.12, groundY - h * 0.62, w * 0.22, h * 0.18, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawEnvironment(tierId, groundY, unitPx, t) {
+        const w = stageW;
+        const h = stageH;
+
+        if (tierId === 0) {
+          // TIER 0: Macro Grass Meadow (1..9)
+          const sky = ctx.createLinearGradient(0, 0, 0, groundY);
+          sky.addColorStop(0, '#38bdf8');
+          sky.addColorStop(1, '#bae6fd');
+          ctx.fillStyle = sky;
+          ctx.fillRect(0, 0, w, groundY);
+
+          // Soft sun & floating pollen bokeh
+          ctx.fillStyle = 'rgba(254, 240, 138, 0.75)';
+          ctx.beginPath();
+          ctx.arc(w * 0.14, h * 0.16, 44, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Distant soft meadow hills & curved grass blades
+          ctx.fillStyle = '#4ade80';
+          ctx.beginPath();
+          ctx.moveTo(0, groundY);
+          ctx.quadraticCurveTo(w * 0.3, groundY - 55, w * 0.65, groundY - 22);
+          ctx.quadraticCurveTo(w * 0.88, groundY - 48, w, groundY - 12);
+          ctx.lineTo(w, groundY);
+          ctx.closePath();
+          ctx.fill();
+
+          for (let i = 0; i < 42; i++) {
+            const gx = (i / 41) * (w + 40) - 20;
+            const curveDir = (i % 2 === 0 ? 1 : -1) * (18 + (i % 5) * 6);
+            const bladeH = 105 + ((i * 37) % 85);
+            const sway = Math.sin(t * 1.6 + i * 0.6) * 8;
+            ctx.fillStyle = (i % 3 === 0) ? '#15803d' : (i % 2 === 0 ? '#16a34a' : '#22c55e');
+            ctx.beginPath();
+            ctx.moveTo(gx - 8, groundY + 4);
+            ctx.quadraticCurveTo(gx + curveDir * 0.4 + sway * 0.5, groundY - bladeH * 0.55, gx + curveDir + sway, groundY - bladeH);
+            ctx.quadraticCurveTo(gx + curveDir * 0.55 + 10 + sway * 0.5, groundY - bladeH * 0.5, gx + 10, groundY + 4);
+            ctx.closePath();
+            ctx.fill();
+          }
+
+          // Cute little red ladybug on grass blade
+          const lbX = w * 0.88;
+          const lbY = groundY - 42;
+          ctx.fillStyle = '#ef4444';
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(lbX, lbY, 9, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.arc(lbX - 7, lbY - 3, 4, 0, Math.PI * 2);
+          ctx.arc(lbX + 2, lbY - 3, 2, 0, Math.PI * 2);
+          ctx.arc(lbX + 4, lbY + 3, 2, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Soil & lush foreground turf
+          const turf = ctx.createLinearGradient(0, groundY, 0, h);
+          turf.addColorStop(0, '#22c55e');
+          turf.addColorStop(0.3, '#16a34a');
+          turf.addColorStop(1, '#14532d');
+          ctx.fillStyle = turf;
+          ctx.fillRect(0, groundY, w, h - groundY);
+
+          // Scale reference: An orange (= 1 unitPx!) & a pebble right next to character
+          const orangeX = w * 0.25;
+          const pebbleX = w * 0.75;
+          drawOrangeProp(orangeX, groundY + 6, unitPx);
+          drawLabelTag(orangeX, groundY + 34, 'Quả cam (= 1 block)');
+          drawPebbleProp(pebbleX, groundY + 6, unitPx * 0.9);
+          drawLabelTag(pebbleX, groundY + 34, 'Viên sỏi');
+
+          // Cute dandelion flower on far left
+          ctx.strokeStyle = '#15803d';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(w * 0.1, groundY + 8);
+          ctx.quadraticCurveTo(w * 0.11, groundY - 110, w * 0.12, groundY - 200);
+          ctx.stroke();
+          ctx.fillStyle = '#facc15';
+          ctx.beginPath();
+          ctx.arc(w * 0.12, groundY - 205, 18, 0, Math.PI * 2);
+          ctx.fill();
+
+        } else if (tierId === 1) {
+          // TIER 1: Garden & Backyard (10..99)
+          const sky = ctx.createLinearGradient(0, 0, 0, groundY);
+          sky.addColorStop(0, '#38bdf8');
+          sky.addColorStop(1, '#e0f2fe');
+          ctx.fillStyle = sky;
+          ctx.fillRect(0, 0, w, groundY);
+
+          // Fluffy clouds
+          drawClouds(w, h * 0.25, t, 0.85);
+
+          // Rolling hills
+          ctx.fillStyle = '#86efac';
+          ctx.beginPath();
+          ctx.moveTo(0, groundY);
+          ctx.quadraticCurveTo(w * 0.25, groundY - 80, w * 0.55, groundY);
+          ctx.quadraticCurveTo(w * 0.8, groundY - 60, w, groundY - 15);
+          ctx.lineTo(w, groundY);
+          ctx.fill();
+
+          // White picket fence
+          ctx.fillStyle = '#f8fafc';
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 1.5;
+          const fenceH = Math.max(30, unitPx * 3.5);
+          ctx.fillRect(0, groundY - fenceH * 0.65, w, fenceH * 0.15);
+          for (let fx = 10; fx < w; fx += 28) {
+            ctx.beginPath();
+            ctx.moveTo(fx, groundY);
+            ctx.lineTo(fx, groundY - fenceH * 0.85);
+            ctx.lineTo(fx + 9, groundY - fenceH);
+            ctx.lineTo(fx + 18, groundY - fenceH * 0.85);
+            ctx.lineTo(fx + 18, groundY);
+            ctx.fill();
+            ctx.stroke();
+          }
+
+          // Cozy house on left
+          const houseScale = Math.max(55, unitPx * 11);
+          const hx = w * 0.14;
+          ctx.fillStyle = '#fef3c7';
+          ctx.strokeStyle = '#92400e';
+          ctx.lineWidth = 2.5;
+          ctx.fillRect(hx - houseScale * 0.5, groundY - houseScale * 0.65, houseScale, houseScale * 0.65);
+          ctx.strokeRect(hx - houseScale * 0.5, groundY - houseScale * 0.65, houseScale, houseScale * 0.65);
+          // Roof
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.moveTo(hx - houseScale * 0.6, groundY - houseScale * 0.65);
+          ctx.lineTo(hx, groundY - houseScale * 1.08);
+          ctx.lineTo(hx + houseScale * 0.6, groundY - houseScale * 0.65);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          // Door
+          ctx.fillStyle = '#92400e';
+          ctx.fillRect(hx - houseScale * 0.1, groundY - houseScale * 0.32, houseScale * 0.2, houseScale * 0.32);
+
+          // Apple tree on right
+          const tx = w * 0.82;
+          const treeH = Math.max(70, unitPx * 13);
+          ctx.fillStyle = '#78350f';
+          ctx.fillRect(tx - treeH * 0.08, groundY - treeH * 0.55, treeH * 0.16, treeH * 0.55);
+          ctx.fillStyle = '#22c55e';
+          ctx.beginPath();
+          ctx.arc(tx, groundY - treeH * 0.72, treeH * 0.35, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#ef4444';
+          [[-0.14, -0.78], [0.12, -0.68], [0.02, -0.88]].forEach(([dx, dy]) => {
+            ctx.beginPath();
+            ctx.arc(tx + treeH * dx, groundY + treeH * dy, Math.max(4, treeH * 0.04), 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          // Ground lawn
+          ctx.fillStyle = '#22c55e';
+          ctx.fillRect(0, groundY, w, h - groundY);
+          drawLabelTag(hx, groundY + 26, 'Ngôi nhà vườn');
+          drawLabelTag(tx, groundY + 26, 'Cây táo');
+
+        } else if (tierId === 2) {
+          // TIER 2: City & Skyscrapers (100..999)
+          const sky = ctx.createLinearGradient(0, 0, 0, groundY);
+          sky.addColorStop(0, '#0284c7');
+          sky.addColorStop(1, '#bae6fd');
+          ctx.fillStyle = sky;
+          ctx.fillRect(0, 0, w, groundY);
+          drawClouds(w, h * 0.2, t, 0.9);
+
+          // City skyline silhouettes + detailed buildings on sides
+          const bldgs = [
+            { x: 0.05, bw: 0.11, bh: 0.36, c: '#64748b' },
+            { x: 0.17, bw: 0.1, bh: 0.48, c: '#475569' },
+            { x: 0.73, bw: 0.1, bh: 0.44, c: '#475569' },
+            { x: 0.85, bw: 0.11, bh: 0.32, c: '#64748b' },
+          ];
+          bldgs.forEach((b) => {
+            const bx = w * b.x;
+            const bw = w * b.bw;
+            const bh = h * b.bh;
+            ctx.fillStyle = b.c;
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 2;
+            ctx.fillRect(bx, groundY - bh, bw, bh);
+            ctx.strokeRect(bx, groundY - bh, bw, bh);
+            ctx.fillStyle = '#fde047';
+            for (let wy = groundY - bh + 16; wy < groundY - 22; wy += 24) {
+              for (let wx = bx + 10; wx < bx + bw - 14; wx += 18) {
+                ctx.fillRect(wx, wy, 9, 13);
+              }
+            }
+          });
+
+          // School Bus on left side of road
+          const busX = w * 0.22;
+          const busW = Math.max(60, Math.min(130, unitPx * 4.5));
+          const busH = busW * 0.45;
+          ctx.fillStyle = '#facc15';
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(busX - busW / 2, groundY - busH - 5, busW, busH, 8);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillRect(busX - busW * 0.38, groundY - busH + 2, busW * 0.75, busH * 0.38);
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.arc(busX - busW * 0.28, groundY - 4, busH * 0.18, 0, Math.PI * 2);
+          ctx.arc(busX + busW * 0.28, groundY - 4, busH * 0.18, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Road ground
+          ctx.fillStyle = '#334155';
+          ctx.fillRect(0, groundY, w, h - groundY);
+          ctx.fillStyle = '#f8fafc';
+          for (let rx = 20; rx < w; rx += 60) {
+            ctx.fillRect(rx, groundY + 18, 32, 5);
+          }
+          drawLabelTag(busX, groundY + 42, 'Xe buýt thành phố');
+          drawLabelTag(w * 0.78, groundY + 42, 'Tòa nhà cao tầng');
+
+        } else if (tierId === 3) {
+          // TIER 3: Mountains & Stratosphere (1,000..99,999)
+          const sky = ctx.createLinearGradient(0, 0, 0, groundY);
+          sky.addColorStop(0, '#0f172a');
+          sky.addColorStop(0.45, '#1d4ed8');
+          sky.addColorStop(1, '#93c5fd');
+          ctx.fillStyle = sky;
+          ctx.fillRect(0, 0, w, groundY);
+          drawStars(w, h * 0.35, 30, t);
+
+          // Everest snow mountains
+          const peaks = [
+            { x: w * 0.18, pw: 260, ph: 230 },
+            { x: w * 0.82, pw: 290, ph: 260 },
+            { x: w * 0.5, pw: 340, ph: 165 }
+          ];
+          peaks.forEach((p) => {
+            ctx.fillStyle = '#475569';
+            ctx.beginPath();
+            ctx.moveTo(p.x - p.pw / 2, groundY);
+            ctx.lineTo(p.x, groundY - p.ph);
+            ctx.lineTo(p.x + p.pw / 2, groundY);
+            ctx.closePath();
+            ctx.fill();
+            // Snow cap
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath();
+            ctx.moveTo(p.x - p.pw * 0.18, groundY - p.ph * 0.64);
+            ctx.lineTo(p.x, groundY - p.ph);
+            ctx.lineTo(p.x + p.pw * 0.18, groundY - p.ph * 0.64);
+            ctx.lineTo(p.x + p.pw * 0.07, groundY - p.ph * 0.7);
+            ctx.lineTo(p.x - p.pw * 0.05, groundY - p.ph * 0.62);
+            ctx.closePath();
+            ctx.fill();
+          });
+
+          // Flying airplane
+          const px = ((t * 48) % (w + 160)) - 80;
+          const py = h * 0.28 + Math.sin(t) * 6;
+          ctx.save();
+          ctx.translate(px, py);
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 26, 7, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(-6, 0);
+          ctx.lineTo(-16, -15);
+          ctx.lineTo(4, 0);
+          ctx.fill();
+          ctx.restore();
+
+          // Hot air balloon
+          const bx = w * 0.24;
+          const by = h * 0.42 + Math.sin(t * 1.5) * 8;
+          ctx.fillStyle = '#f97316';
+          ctx.beginPath();
+          ctx.arc(bx, by, 22, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#78350f';
+          ctx.fillRect(bx - 7, by + 26, 14, 10);
+
+          // Ground clouds & ridge
+          ctx.fillStyle = '#e2e8f0';
+          ctx.fillRect(0, groundY, w, h - groundY);
+          drawLabelTag(w * 0.82, groundY + 28, 'Đỉnh núi Everest');
+          drawLabelTag(bx, by - 34, 'Khinh khí cầu');
+
+        } else if (tierId === 4) {
+          // TIER 4: Low Earth Orbit (100,000..9,999,999)
+          const space = ctx.createLinearGradient(0, 0, 0, h);
+          space.addColorStop(0, '#020617');
+          space.addColorStop(1, '#0f172a');
+          ctx.fillStyle = space;
+          ctx.fillRect(0, 0, w, h);
+          drawStars(w, h * 0.8, 90, t);
+
+          // Curved blue Earth horizon at bottom
+          const earthR = w * 1.35;
+          const earthY = groundY + earthR - 18;
+          // Atmosphere glow
+          ctx.beginPath();
+          ctx.arc(w / 2, earthY, earthR + 18, Math.PI * 1.1, Math.PI * 1.9);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+          ctx.lineWidth = 28;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(w / 2, earthY, earthR, 0, Math.PI * 2);
+          ctx.fillStyle = '#0284c7';
+          ctx.fill();
+
+          // Continents
+          ctx.save();
+          ctx.clip();
+          ctx.fillStyle = '#22c55e';
+          ctx.beginPath();
+          ctx.ellipse(w * 0.25, groundY + 35, 130, 45, 0.15, 0, Math.PI * 2);
+          ctx.ellipse(w * 0.78, groundY + 42, 160, 55, -0.1, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = 'rgba(255,255,255,0.55)';
+          ctx.beginPath();
+          ctx.ellipse(w * 0.45, groundY + 25, 110, 14, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+
+          // Orbiting Space Station (ISS)
+          const issX = w * 0.18 + Math.sin(t * 0.6) * 16;
+          const issY = h * 0.34;
+          ctx.fillStyle = '#cbd5e1';
+          ctx.fillRect(issX - 28, issY - 4, 56, 8);
+          ctx.fillStyle = '#2563eb';
+          ctx.fillRect(issX - 24, issY - 22, 12, 36);
+          ctx.fillRect(issX + 12, issY - 22, 12, 36);
+          drawLabelTag(issX, issY + 32, 'Trạm vũ trụ ISS', true);
+          drawLabelTag(w * 0.8, groundY + 30, 'Lục địa Trái Đất', true);
+
+        } else if (tierId === 5) {
+          // TIER 5: Solar System (10^7 .. 9.99 * 10^9)
+          ctx.fillStyle = '#030712';
+          ctx.fillRect(0, 0, w, h);
+          drawStars(w, h, 140, t);
+
+          // Faint orbit arcs
+          ctx.strokeStyle = 'rgba(148, 163, 184, 0.22)';
+          ctx.lineWidth = 1.5;
+          [180, 320, 480].forEach((r) => {
+            ctx.beginPath();
+            ctx.ellipse(w * 0.12, h * 0.35, r, r * 0.55, 0.2, 0, Math.PI * 2);
+            ctx.stroke();
+          });
+
+          // Glowing Sun on top-left
+          const sunX = w * 0.13;
+          const sunY = h * 0.28;
+          const sunGlow = ctx.createRadialGradient(sunX, sunY, 20, sunX, sunY, 120);
+          sunGlow.addColorStop(0, '#fef08a');
+          sunGlow.addColorStop(0.45, '#f97316');
+          sunGlow.addColorStop(1, 'rgba(249, 115, 22, 0)');
+          ctx.fillStyle = sunGlow;
+          ctx.beginPath();
+          ctx.arc(sunX, sunY, 120, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#fde047';
+          ctx.beginPath();
+          ctx.arc(sunX, sunY, 54, 0, Math.PI * 2);
+          ctx.fill();
+          drawLabelTag(sunX, sunY + 72, 'Mặt Trời', true);
+
+          // Planet Earth on left-bottom
+          const ex = w * 0.25;
+          const ey = groundY - 35;
+          ctx.fillStyle = '#2563eb';
+          ctx.beginPath();
+          ctx.arc(ex, ey, 34, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#22c55e';
+          ctx.beginPath();
+          ctx.arc(ex - 10, ey - 8, 13, 0, Math.PI * 2);
+          ctx.arc(ex + 12, ey + 8, 10, 0, Math.PI * 2);
+          ctx.fill();
+          drawLabelTag(ex, ey + 50, 'Trái Đất', true);
+
+          // Saturn with rings on right
+          const sx = w * 0.82;
+          const sy = h * 0.42;
+          ctx.fillStyle = '#eab308';
+          ctx.beginPath();
+          ctx.arc(sx, sy, 36, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 8;
+          ctx.beginPath();
+          ctx.ellipse(sx, sy, 68, 18, -0.25, 0, Math.PI * 2);
+          ctx.stroke();
+          drawLabelTag(sx, sy + 52, 'Sao Thổ', true);
+
+        } else if (tierId === 6) {
+          // TIER 6: Milky Way & Nebulae (10^10 .. 9.99 * 10^14)
+          ctx.fillStyle = '#050214';
+          ctx.fillRect(0, 0, w, h);
+
+          // Colorful Nebulae clouds
+          const neb1 = ctx.createRadialGradient(w * 0.25, h * 0.35, 10, w * 0.25, h * 0.35, 240);
+          neb1.addColorStop(0, 'rgba(236, 72, 153, 0.35)');
+          neb1.addColorStop(0.5, 'rgba(139, 92, 246, 0.18)');
+          neb1.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = neb1;
+          ctx.fillRect(0, 0, w, h);
+
+          const neb2 = ctx.createRadialGradient(w * 0.8, h * 0.45, 10, w * 0.8, h * 0.45, 220);
+          neb2.addColorStop(0, 'rgba(14, 165, 233, 0.32)');
+          neb2.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = neb2;
+          ctx.fillRect(0, 0, w, h);
+
+          drawStars(w, h, 200, t);
+
+          // Spiral Milky Way disc on left
+          drawMiniGalaxy(w * 0.2, h * 0.48, 86, '#f472b6', '#60a5fa', t * 0.2);
+          drawLabelTag(w * 0.2, h * 0.48 + 76, 'Dải Ngân Hà', true);
+
+        } else {
+          // TIER 7: Deep Cosmic Universe (10^15+ -> Tỉ tỉ!)
+          const cosmos = ctx.createRadialGradient(w * 0.5, h * 0.5, 40, w * 0.5, h * 0.5, w * 0.8);
+          cosmos.addColorStop(0, '#1e1b4b');
+          cosmos.addColorStop(0.6, '#090d1f');
+          cosmos.addColorStop(1, '#020617');
+          ctx.fillStyle = cosmos;
+          ctx.fillRect(0, 0, w, h);
+
+          // Cosmic web filaments
+          ctx.strokeStyle = 'rgba(167, 139, 250, 0.15)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(0, h * 0.2);
+          ctx.bezierCurveTo(w * 0.3, h * 0.6, w * 0.7, h * 0.15, w, h * 0.7);
+          ctx.moveTo(w * 0.1, h * 0.85);
+          ctx.bezierCurveTo(w * 0.4, h * 0.3, w * 0.65, h * 0.8, w * 0.95, h * 0.25);
+          ctx.stroke();
+
+          drawStars(w, h, 240, t);
+
+          // Multiple miniature spiral galaxies floating like glowing pebbles around the giant character!
+          const galaxies = [
+            { x: 0.16, y: 0.34, r: 42, c1: '#f472b6', c2: '#38bdf8', sp: 0.25 },
+            { x: 0.22, y: 0.74, r: 30, c1: '#facc15', c2: '#fb923c', sp: -0.3 },
+            { x: 0.83, y: 0.32, r: 46, c1: '#a855f7', c2: '#22d3ee', sp: 0.2 },
+            { x: 0.78, y: 0.72, r: 34, c1: '#34d399', c2: '#818cf8', sp: -0.22 },
+            { x: 0.11, y: 0.55, r: 22, c1: '#f87171', c2: '#fbbf24', sp: 0.35 }
+          ];
+          galaxies.forEach((g) => {
+            drawMiniGalaxy(w * g.x, h * g.y, g.r, g.c1, g.c2, t * g.sp);
+          });
+          drawLabelTag(w * 0.16, h * 0.34 + 48, 'Thiên hà xoắn ốc', true);
+          drawLabelTag(w * 0.83, h * 0.32 + 52, 'Cụm thiên hà', true);
+        }
+      }
+
+      function drawClouds(w, maxY, t, alpha) {
+        ctx.save();
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+        for (let i = 0; i < 4; i++) {
+          const cx = ((i * w * 0.32 + t * (10 + i * 4)) % (w + 180)) - 90;
+          const cy = 65 + (i % 2) * 55;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 26, 0, Math.PI * 2);
+          ctx.arc(cx + 24, cy - 10, 32, 0, Math.PI * 2);
+          ctx.arc(cx + 52, cy, 24, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // Deterministic star positions
+      const STAR_FIELD = Array.from({ length: 260 }, (_, i) => ({
+        rx: ((i * 73 + 19) % 997) / 997,
+        ry: ((i * 137 + 53) % 991) / 991,
+        r: ((i % 3) + 1) * 0.8,
+        phase: i * 0.7
+      }));
+
+      function drawStars(w, maxY, count, t) {
+        ctx.save();
+        for (let i = 0; i < count && i < STAR_FIELD.length; i++) {
+          const s = STAR_FIELD[i];
+          const tw = 0.45 + 0.55 * Math.sin(t * 2.2 + s.phase);
+          ctx.fillStyle = `rgba(255, 255, 255, ${tw})`;
+          ctx.beginPath();
+          ctx.arc(s.rx * w, s.ry * maxY, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawMiniGalaxy(cx, cy, radius, c1, c2, rot) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(-0.35);
+        ctx.scale(1, 0.55);
+        ctx.rotate(rot);
+
+        const core = ctx.createRadialGradient(0, 0, 1, 0, 0, radius);
+        core.addColorStop(0, '#ffffff');
+        core.addColorStop(0.25, c1);
+        core.addColorStop(0.65, c2);
+        core.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Spiral arms
+        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+        ctx.lineWidth = Math.max(1.5, radius * 0.08);
+        for (let arm = 0; arm < 2; arm++) {
+          ctx.beginPath();
+          for (let a = 0; a < Math.PI * 2.4; a += 0.2) {
+            const rr = (a / (Math.PI * 2.4)) * radius * 0.92;
+            const ang = a + arm * Math.PI;
+            const px = Math.cos(ang) * rr;
+            const py = Math.sin(ang) * rr;
+            if (a === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // =========================================================================
+      // 8. PARTICLE EFFECTS (5-Pointed Cartoon Stars from numbers_block.jpeg)
+      // =========================================================================
+      function drawFivePointStar(x, y, r, color, rot, alpha) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rot);
+        ctx.globalAlpha = Math.max(0, alpha);
+        ctx.beginPath();
+        for (let i = 0; i < 10; i++) {
+          const rad = i % 2 === 0 ? r : r * 0.45;
+          const ang = (Math.PI / 5) * i - Math.PI / 2;
+          const sx = Math.cos(ang) * rad;
+          const sy = Math.sin(ang) * rad;
+          if (i === 0) ctx.moveTo(sx, sy);
+          else ctx.lineTo(sx, sy);
+        }
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function spawnSparkleStars(cx, cy, count = 14) {
+        const colors = ['#FACC15', '#EC4899', '#4ADE80', '#A855F7', '#FB923C', '#38BDF8'];
+        for (let i = 0; i < count; i++) {
+          const ang = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+          const speed = 90 + Math.random() * 160;
+          state.stars.push({
+            x: cx + (Math.random() - 0.5) * 80,
+            y: cy + (Math.random() - 0.5) * 80,
+            vx: Math.cos(ang) * speed,
+            vy: Math.sin(ang) * speed - 40,
+            r: 8 + Math.random() * 9,
+            rot: Math.random() * Math.PI,
+            vrot: (Math.random() - 0.5) * 4,
+            color: colors[i % colors.length],
+            life: 1.0
+          });
+        }
+      }
+
+      // =========================================================================
+      // 9. MAIN RENDER LOOP
+      // =========================================================================
+      let lastTime = performance.now();
+
+      function render(now) {
+        const dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+        const t = now / 1000;
+
+        // Physics updates
+        state.animLogScale += (state.targetLogScale - state.animLogScale) * Math.min(1, dt * 6);
+        if (state.tierFade < 1) state.tierFade = Math.min(1, state.tierFade + dt * 2.5);
+
+        // Spring bounce
+        const force = (1 - state.scaleBounce) * 140;
+        state.bounceVel = (state.bounceVel + force * dt) * Math.exp(-10 * dt);
+        state.scaleBounce += state.bounceVel * dt;
+
+        // Shake decay
+        if (state.shakeTimer > 0) {
+          state.shakeTimer = Math.max(0, state.shakeTimer - dt);
+          state.shakeOffset = Math.sin(t * 50) * 9 * (state.shakeTimer / 0.35);
+        } else {
+          state.shakeOffset = 0;
+        }
+
+        // Expression timer & blinking
+        if (state.exprTimer > 0) {
+          state.exprTimer -= dt;
+          if (state.exprTimer <= 0) state.expression = 'happy';
+        }
+        state.blinkTimer -= dt;
+        if (state.blinkTimer <= 0) {
+          state.isBlinking = !state.isBlinking;
+          state.blinkTimer = state.isBlinking ? 0.13 : (2.2 + Math.random() * 3.0);
+        }
+
+        ctx.save();
+        ctx.scale(dpr, dpr);
+
+        const groundY = stageH * 0.80;
+        const m = state.model;
+
+        // Compute optimal unitPx so character fits cleanly AND grows visibly inside each world tier
+        const tier = state.tier;
+        const tierSpan = Math.max(0.5, tier.maxLog - tier.minLog);
+        const progress = Math.max(0, Math.min(1, (state.animLogScale - tier.minLog) / tierSpan));
+
+        // Base desired pixel height within current tier
+        let minDesiredH = tier.id === 0 ? stageH * 0.14 : stageH * 0.25;
+        let maxDesiredH = stageH * 0.50;
+        const desiredH = minDesiredH + (maxDesiredH - minDesiredH) * progress;
+
+        // Projected normalized bounding dimensions
+        const spanW = m.totalW + m.totalD * ISO_Z.x;
+        const spanH = m.totalH + m.totalD * Math.abs(ISO_Z.y);
+
+        const maxAllowedW = stageW * 0.56;
+        const maxAllowedH = stageH * 0.52;
+        const unitByH = desiredH / Math.max(1, spanH);
+        const unitByW = maxAllowedW / Math.max(1, spanW);
+        const unitByMaxH = maxAllowedH / Math.max(1, spanH);
+        const unitPx = Math.max(8, Math.min(unitByH, unitByW, unitByMaxH));
+
+        // Draw Background Environment (with smooth fade when transitioning tiers)
+        drawEnvironment(tier.id, groundY, unitPx, t);
+        if (state.tierFade < 1 && state.prevTierId !== tier.id) {
+          ctx.save();
+          ctx.globalAlpha = 1 - state.tierFade;
+          drawEnvironment(state.prevTierId, groundY, unitPx, t);
+          ctx.restore();
+        }
+
+        // Character anchor position (centered horizontally in stage)
+        const legLen = Math.max(22, Math.min(40, m.totalH * unitPx * 0.14 + 12));
+        const charBottomY = groundY - legLen * 0.92;
+        const projWidthPx = spanW * unitPx;
+        const originX = stageW * 0.5 - (m.totalW * unitPx) * 0.5 + state.shakeOffset;
+
+        // Ground shadow under feet
+        ctx.save();
+        ctx.fillStyle = tier.id >= 4 ? 'rgba(148, 163, 184, 0.2)' : 'rgba(15, 23, 42, 0.24)';
+        ctx.beginPath();
+        ctx.ellipse(stageW * 0.5 + state.shakeOffset, groundY + 4, Math.max(24, projWidthPx * 0.42), 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Main character color for arms & legs
+        const firstMod = m.modules[0];
+        const primaryDigit = firstMod.digit;
+        const primaryColor = (firstMod.placeInTier === 1 && primaryDigit === 1)
+          ? '#EE1C25'
+          : (DIGIT_COLORS[primaryDigit] ? DIGIT_COLORS[primaryDigit].arm : '#EE1C25');
+        const rightMod = m.modules[m.modules.length - 1];
+        const rightColor = (rightMod.placeInTier === 1 && rightMod.digit === 1)
+          ? '#EE1C25'
+          : (DIGIT_COLORS[rightMod.digit] ? DIGIT_COLORS[rightMod.digit].arm : primaryColor);
+
+        // Apply spring squash & stretch around feet center
+        ctx.save();
+        const pivotX = stageW * 0.5 + state.shakeOffset;
+        const pivotY = groundY;
+        ctx.translate(pivotX, pivotY);
+        const sx = 2 - state.scaleBounce; // volume-preserving squash & stretch
+        const sy = state.scaleBounce;
+        ctx.scale(Math.max(0.75, Math.min(1.25, sx)), Math.max(0.75, Math.min(1.3, sy)));
+        ctx.translate(-pivotX, -pivotY);
+
+        // 1) Legs & Red Sneakers
+        const leftFootX = originX + Math.max(10, m.totalW * unitPx * 0.28);
+        const rightFootX = originX + Math.min(m.totalW * unitPx - 10, m.totalW * unitPx * 0.72);
+        const clampedSpread = Math.min(85, Math.max(14, (rightFootX - leftFootX) * 0.5));
+        const midBaseX = originX + (m.totalW * unitPx) * 0.5;
+        drawLegAndShoe(midBaseX - clampedSpread, charBottomY, legLen, primaryColor, -1);
+        drawLegAndShoe(midBaseX + clampedSpread, charBottomY, legLen, rightColor, 1);
+
+        // 2) Left Arm (behind/left of leftmost block)
+        const armLen = Math.max(24, Math.min(72, m.totalH * unitPx * 0.42));
+        const leftArmY = charBottomY - Math.max(unitPx * 0.45, firstMod.h * unitPx * 0.56);
+        const idleWave = Math.sin(t * 2.5) * 0.12;
+        const rightWave = state.exprTimer > 0 && state.expression !== 'confused'
+          ? -0.65 + Math.sin(t * 10) * 0.25
+          : 0.35 + idleWave;
+        drawArm(originX + 2, leftArmY, -1, armLen, primaryColor, 0.48 - idleWave);
+
+        // 3) Isometric 3D Numberblocks Body
+        drawCharacterBlocks(originX, charBottomY, unitPx, m);
+
+        // 4) Right Arm (on outer right side of rightmost module!)
+        const rightEdgePt = project3D(
+          originX,
+          charBottomY,
+          unitPx,
+          m.totalW,
+          Math.max(0.45 * rightMod.scale, rightMod.h * 0.54),
+          rightMod.d * 0.4
+        );
+        drawArm(rightEdgePt.x - 2, rightEdgePt.y, 1, armLen, rightColor, rightWave);
+
+        // 5) Character Face (placed on front face of primary module!)
+        const faceW = firstMod.w * unitPx;
+        const faceH = firstMod.h * unitPx;
+        const faceSize = firstMod.rows <= 2
+          ? Math.max(24, Math.min(faceW * 0.86, faceH * 0.86, 120))
+          : Math.max(24, Math.min(faceW * 0.85, faceH * 0.52, 125));
+        // For tall narrow columns (like 10 or 20), place face near upper 20% just like numbers_block.jpeg
+        const faceYFrac = (firstMod.rows >= 8 && firstMod.cols <= 4)
+          ? 0.82
+          : (firstMod.cols >= 8 && firstMod.rows >= 8)
+            ? 0.62
+            : (firstMod.rows >= 4 ? 0.74 : 0.5);
+        const facePt = project3D(
+          originX,
+          charBottomY,
+          unitPx,
+          firstMod.x0 + firstMod.w * 0.5,
+          firstMod.h * faceYFrac,
+          0
+        );
+        drawFace(facePt.x, facePt.y, faceSize, state.expression, state.isBlinking);
+
+        // 6) Tiny Remainder Magnifier Chip (when N spans > 2 powers of 1000, e.g., 1,000,001)
+        if (m.tinyRemainder > 0n) {
+          const chipX = rightEdgePt.x + 28;
+          const chipY = charBottomY - 14;
+          ctx.save();
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([4, 3]);
+          ctx.beginPath();
+          ctx.moveTo(rightEdgePt.x - 6, charBottomY - 4);
+          ctx.lineTo(chipX, chipY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          const txt = `+ ${formatBigInt(m.tinyRemainder)}`;
+          ctx.font = '800 12px "Nunito", sans-serif';
+          const tw = ctx.measureText(txt).width + 16;
+          ctx.fillStyle = '#fef08a';
+          ctx.beginPath();
+          ctx.roundRect(chipX, chipY - 13, tw, 26, 13);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = '#0f172a';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(txt, chipX + tw / 2, chipY);
+          ctx.restore();
+        }
+
+        // 7) Rainbow Numberling Badge floating above the character's head
+        const topCenter = project3D(
+          originX,
+          charBottomY,
+          unitPx,
+          firstMod.x0 + firstMod.w * 0.5,
+          m.totalH,
+          firstMod.d * 0.5
+        );
+        const badgeR = Math.max(19, Math.min(30, unitPx * 0.55 + 12));
+        const badgeFloat = Math.sin(t * 2.8) * 3;
+        drawNumberling(topCenter.x, Math.max(96, topCenter.y - badgeR - 14 + badgeFloat), formatBigInt(state.value), badgeR);
+
+        ctx.restore(); // end squash/stretch
+
+        // 8) Sparkle stars
+        for (let i = state.stars.length - 1; i >= 0; i--) {
+          const st = state.stars[i];
+          st.x += st.vx * dt;
+          st.y += st.vy * dt;
+          st.vy += 180 * dt;
+          st.rot += st.vrot * dt;
+          st.life -= dt * 1.15;
+          if (st.life <= 0) {
+            state.stars.splice(i, 1);
+          } else {
+            drawFivePointStar(st.x, st.y, st.r, st.color, st.rot, st.life);
+          }
+        }
+
+        // 9) Floating operation pill (+100, x10...)
+        if (state.floatingText) {
+          const ft = state.floatingText;
+          ft.y -= 55 * dt;
+          ft.life -= dt * 1.1;
+          if (ft.life <= 0) {
+            state.floatingText = null;
+          } else {
+            ctx.save();
+            ctx.globalAlpha = Math.min(1, ft.life * 1.4);
+            ctx.font = '900 28px "Nunito", "Segoe UI", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = '#1e293b';
+            ctx.strokeText(ft.text, ft.x, ft.y);
+            ctx.fillStyle = ft.color;
+            ctx.fillText(ft.text, ft.x, ft.y);
+            ctx.restore();
+          }
+        }
+
+        ctx.restore();
+        requestAnimationFrame(render);
+      }
+
+      requestAnimationFrame(render);
+
+      // =========================================================================
+      // 10. INTERACTION & OPERATION HANDLERS
+      // =========================================================================
+      const hudValue = document.getElementById('hudValue');
+      const hudShortUnit = document.getElementById('hudShortUnit');
+      const hudVietnamese = document.getElementById('hudVietnamese');
+      const hudSceneBadge = document.getElementById('hudSceneBadge');
+      const hudSceneTitle = document.getElementById('hudSceneTitle');
+      const hudSceneCompare = document.getElementById('hudSceneCompare');
+      const structurePill = document.getElementById('structurePill');
+      const sizePill = document.getElementById('sizePill');
+      const equationBox = document.getElementById('equationBox');
+      const speechBubble = document.getElementById('speechBubble');
+      const opButtons = Array.from(document.querySelectorAll('.op-btn'));
+
+      function showSpeech(msg, durationMs = 3000) {
+        speechBubble.textContent = msg;
+        speechBubble.classList.add('visible');
+        clearTimeout(state.speechTimer);
+        state.speechTimer = setTimeout(() => {
+          speechBubble.classList.remove('visible');
+        }, durationMs);
+      }
+
+      function savePrefs() {
+        try {
+          localStorage.setItem('nb_value', state.value.toString());
+          localStorage.setItem('nb_sound', SoundFX.enabled ? '1' : '0');
+        } catch (e) {}
+      }
+
+      function updateUI(skipSave = false) {
+        const val = state.value;
+        hudValue.textContent = formatBigInt(val);
+        hudShortUnit.textContent = getShortVietnameseUnit(val);
+        hudVietnamese.textContent = bigIntToVietnamese(val);
+
+        const tier = state.tier;
+        hudSceneBadge.textContent = tier.badge;
+        hudSceneTitle.textContent = tier.title;
+        hudSceneCompare.textContent = tier.compare;
+        structurePill.textContent = `Cấu tạo: ${state.model.structureText}`;
+        sizePill.textContent = `Chiều cao ước tính: ${estimateHeightText(val)}`;
+
+        // Mark unavailable operations visually (sub < 1 or non-exact division)
+        opButtons.forEach((btn) => {
+          const op = btn.dataset.op;
+          const v = BigInt(btn.dataset.val);
+          let invalid = false;
+          if (op === 'sub' && val - v < 1n) invalid = true;
+          if (op === 'div' && val % v !== 0n) invalid = true;
+          btn.classList.toggle('unavailable', invalid);
+        });
+
+        document.getElementById('btnUndo').disabled = state.history.length === 0;
+        document.getElementById('btnUndo').style.opacity = state.history.length === 0 ? '0.5' : '1';
+        if (!skipSave) savePrefs();
+      }
+
+      function commitNewValue(newVal, eqText, isGrow, opBadgeText, opColor) {
+        const oldTier = state.tier;
+        state.history.push(state.value);
+        if (state.history.length > 60) state.history.shift();
+
+        state.value = newVal;
+        state.model = buildCharacterModel(newVal);
+        const newTier = getWorldTier(newVal);
+        state.tier = newTier;
+        state.targetLogScale = getLog10Approx(newVal);
+
+        if (newTier.id !== oldTier.id) {
+          state.prevTierId = oldTier.id;
+          state.tierFade = 0;
+          if (newTier.id > oldTier.id) {
+            SoundFX.playLevelUp();
+            showSpeech(`Oa! Đã lớn tới "${newTier.title}" rồi!`, 3600);
+          } else {
+            showSpeech(`Thu nhỏ về "${newTier.title}" nào!`, 2600);
+          }
+        }
+
+        // Bounce & Expression
+        state.scaleBounce = isGrow ? 1.24 : 0.78;
+        state.expression = isGrow ? (newVal % 10n === 0n ? 'laugh' : 'happy') : 'surprised';
+        state.exprTimer = 1.1;
+
+        // Visual FX
+        spawnSparkleStars(stageW * 0.5, stageH * 0.48, isGrow ? 16 : 8);
+        if (opBadgeText) {
+          state.floatingText = {
+            x: stageW * 0.5,
+            y: stageH * 0.36,
+            text: opBadgeText,
+            color: opColor,
+            life: 1.0
+          };
+        }
+
+        equationBox.textContent = eqText;
+        updateUI();
+      }
+
+      function triggerInvalid(btn, msg) {
+        btn.classList.remove('btn-shake');
+        void btn.offsetWidth;
+        btn.classList.add('btn-shake');
+
+        state.shakeTimer = 0.35;
+        state.expression = 'confused';
+        state.exprTimer = 1.6;
+        SoundFX.playError();
+        showSpeech(msg, 3400);
+      }
+
+      opButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const op = btn.dataset.op;
+          const v = BigInt(btn.dataset.val);
+          const cur = state.value;
+
+          if (op === 'add') {
+            const next = cur + v;
+            if (next > MAX_VALUE) {
+              return triggerInvalid(btn, 'Ồ! Số đã chạm ngưỡng Siêu Vũ Trụ rồi!');
+            }
+            SoundFX.playAdd();
+            commitNewValue(next, `${formatBigInt(cur)} + ${formatBigInt(v)} = ${formatBigInt(next)}`, true, `+${formatBigInt(v)}`, '#4ade80');
+          } else if (op === 'sub') {
+            const next = cur - v;
+            if (next < 1n) {
+              return triggerInvalid(btn, `Số hiện tại (${formatBigInt(cur)}) nhỏ hơn hoặc bằng ${v} rồi! Numberblock nhỏ nhất là 1 nhé!`);
+            }
+            SoundFX.playSubtract();
+            commitNewValue(next, `${formatBigInt(cur)} - ${formatBigInt(v)} = ${formatBigInt(next)}`, false, `-${formatBigInt(v)}`, '#fb7185');
+          } else if (op === 'mul') {
+            const next = cur * v;
+            if (next > MAX_VALUE) {
+              return triggerInvalid(btn, 'Ôi! Số khổng lồ vượt quá giới hạn Siêu Vũ Trụ rồi!');
+            }
+            SoundFX.playMultiply();
+            commitNewValue(next, `${formatBigInt(cur)} × ${v} = ${formatBigInt(next)}`, true, `×${v}`, '#60a5fa');
+          } else if (op === 'div') {
+            if (cur % v !== 0n) {
+              const rem = cur % v;
+              return triggerInvalid(btn, `${formatBigInt(cur)} chia cho ${v} còn dư ${rem}! Hãy chọn phép tính để chia hết nhé!`);
+            }
+            const next = cur / v;
+            SoundFX.playDivide();
+            commitNewValue(next, `${formatBigInt(cur)} ÷ ${v} = ${formatBigInt(next)}`, false, `÷${v}`, '#c084fc');
+          }
+        });
+      });
+
+      // Reset, Undo, Sound, Fullscreen & Android Back Hook
+      document.getElementById('btnReset').addEventListener('click', () => {
+        if (state.value === 1n) return;
+        SoundFX.playDivide();
+        commitNewValue(1n, 'Đặt lại về số 1', false, 'Về 1', '#fde047');
+      });
+
+      function performUndo() {
+        if (state.history.length === 0) return false;
+        const prev = state.history.pop();
+        const isGrow = prev > state.value;
+        state.value = prev;
+        state.model = buildCharacterModel(prev);
+        const newTier = getWorldTier(prev);
+        if (newTier.id !== state.tier.id) {
+          state.prevTierId = state.tier.id;
+          state.tierFade = 0;
+        }
+        state.tier = newTier;
+        state.targetLogScale = getLog10Approx(prev);
+        state.scaleBounce = isGrow ? 1.18 : 0.84;
+        SoundFX.playAdd();
+        equationBox.textContent = `Quay lại số ${formatBigInt(prev)}`;
+        updateUI();
+        return true;
+      }
+
+      document.getElementById('btnUndo').addEventListener('click', performUndo);
+      window.nbAppUndo = performUndo;
+
+      const btnSound = document.getElementById('btnSound');
+      btnSound.addEventListener('click', () => {
+        SoundFX.enabled = !SoundFX.enabled;
+        btnSound.textContent = SoundFX.enabled ? '🔊 Loa' : '🔇 Tắt';
+        btnSound.classList.toggle('sound-off', !SoundFX.enabled);
+        savePrefs();
+        if (SoundFX.enabled) SoundFX.playAdd();
+      });
+
+      const btnFullscreen = document.getElementById('btnFullscreen');
+      btnFullscreen.addEventListener('click', () => {
+        const docEl = document.documentElement;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
+          if (req) req.call(docEl).catch(() => {});
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(() => {});
+          }
+        } else {
+          const exit = document.exitFullscreen || document.webkitExitFullscreen;
+          if (exit) exit.call(document).catch(() => {});
+        }
+      });
+
+      document.getElementById('btnDismissRotate').addEventListener('click', () => {
+        document.getElementById('rotateHint').classList.add('dismissed');
+      });
+
+      // Preset milestone chips
+      document.querySelectorAll('.preset-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const target = BigInt(chip.dataset.preset);
+          if (target === state.value) return;
+          const isGrow = target > state.value;
+          if (isGrow) SoundFX.playMultiply(); else SoundFX.playDivide();
+          commitNewValue(target, `Khám phá số ${formatBigInt(target)}`, isGrow, chip.textContent, '#facc15');
+        });
+      });
+
+      // Initial render: restore URL ?n=... or saved localStorage value
+      const urlN = new URLSearchParams(window.location.search).get('n');
+      let restoredVal = null;
+      if (urlN && /^\d+$/.test(urlN)) {
+        restoredVal = BigInt(urlN);
+      } else {
+        try {
+          const savedVal = localStorage.getItem('nb_value');
+          if (savedVal && /^\d+$/.test(savedVal)) restoredVal = BigInt(savedVal);
+          const savedSound = localStorage.getItem('nb_sound');
+          if (savedSound === '0') {
+            SoundFX.enabled = false;
+            btnSound.textContent = '🔇 Tắt';
+            btnSound.classList.add('sound-off');
+          }
+        } catch (e) {}
+      }
+
+      if (restoredVal && restoredVal >= 1n && restoredVal <= MAX_VALUE) {
+        state.value = restoredVal;
+        state.model = buildCharacterModel(restoredVal);
+        state.tier = getWorldTier(restoredVal);
+        state.targetLogScale = getLog10Approx(restoredVal);
+        state.animLogScale = state.targetLogScale;
+      }
+      updateUI(Boolean(urlN));
+      if (state.value === 1n) {
+        showSpeech('Chào bé! Bấm các phép tính bên phải để biến hóa Numberblock nhé!', 4200);
+      }
+
+      // Register Service Worker for offline PWA & handle Android WebAPK install prompt
+      if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+
+      let deferredPrompt = null;
+      const btnInstallPwa = document.getElementById('btnInstallPwa');
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (btnInstallPwa) btnInstallPwa.classList.add('show');
+      });
+
+      if (btnInstallPwa) {
+        btnInstallPwa.addEventListener('click', async () => {
+          if (!deferredPrompt) return;
+          deferredPrompt.prompt();
+          try {
+            const choice = await deferredPrompt.userChoice;
+            if (choice && choice.outcome === 'accepted') {
+              btnInstallPwa.classList.remove('show');
+            }
+          } catch (err) {}
+          deferredPrompt = null;
+        });
+      }
+
+      window.addEventListener('appinstalled', () => {
+        if (btnInstallPwa) btnInstallPwa.classList.remove('show');
+        deferredPrompt = null;
+      });
+    })();
+  </script>
+</body>
+</html>
