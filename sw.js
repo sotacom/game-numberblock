@@ -1,4 +1,4 @@
-const CACHE_NAME = 'numberblocks-tablet-v4';
+const CACHE_NAME = 'numberblocks-tablet-v5';
 const ASSETS = [
   './',
   './index.html',
