@@ -228,18 +228,18 @@
       border-left: 4px solid #1e293b;
       display: flex;
       flex-direction: column;
-      padding: 6px 10px;
-      gap: 5px;
+      padding: 5px 9px;
+      gap: 4px;
       overflow-y: auto;
     }
 
     .sidebar-header {
       text-align: center;
-      padding-bottom: 1px;
+      padding-bottom: 0;
     }
 
     .logo-title {
-      font-size: clamp(1.05rem, 1.65vw, 1.45rem);
+      font-size: clamp(1rem, 1.55vw, 1.38rem);
       font-weight: 900;
       letter-spacing: 1px;
       text-shadow: 0 2px 0 #1e293b;
@@ -248,7 +248,7 @@
     }
 
     .logo-sub {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
       color: var(--text-muted);
       margin-top: 1px;
@@ -258,13 +258,13 @@
       background: #ffffff;
       border: 2.5px solid #1e293b;
       border-radius: var(--radius-md);
-      padding: 4px 8px;
+      padding: 3px 6px;
       text-align: center;
-      font-size: 0.88rem;
+      font-size: 0.84rem;
       font-weight: 800;
       color: #0f172a;
-      box-shadow: 0 3px 0 rgba(15, 23, 42, 0.12);
-      min-height: 29px;
+      box-shadow: 0 2px 0 rgba(15, 23, 42, 0.12);
+      min-height: 26px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -274,14 +274,14 @@
       background: rgba(255, 255, 255, 0.86);
       border: 2px solid var(--sidebar-border);
       border-radius: var(--radius-lg);
-      padding: 6px 8px;
+      padding: 5px 7px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
     }
 
     .op-section-title {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -294,20 +294,20 @@
     .op-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 5px;
+      gap: 4px;
     }
 
     .op-btn {
       position: relative;
-      border: 2.5px solid #1e293b;
-      border-radius: 10px;
-      padding: 4px 5px;
-      min-height: 33px;
-      font-size: clamp(0.88rem, 1.15vw, 1.02rem);
+      border: 2px solid #1e293b;
+      border-radius: 9px;
+      padding: 2px 4px;
+      min-height: 28px;
+      font-size: clamp(0.84rem, 1.08vw, 0.96rem);
       font-weight: 900;
       color: #ffffff;
       cursor: pointer;
-      box-shadow: 0 3px 0 rgba(15, 23, 42, 0.18);
+      box-shadow: 0 2.5px 0 rgba(15, 23, 42, 0.18);
       transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease, opacity 0.15s ease;
       display: flex;
       align-items: center;
@@ -375,16 +375,16 @@
 
     .util-btn {
       border: 2px solid #1e293b;
-      border-radius: 10px;
-      padding: 5px 2px;
-      min-height: 32px;
-      font-size: 0.72rem;
+      border-radius: 9px;
+      padding: 3px 2px;
+      min-height: 29px;
+      font-size: 0.71rem;
       font-weight: 800;
       white-space: nowrap;
       background: #ffffff;
       color: #0f172a;
       cursor: pointer;
-      box-shadow: 0 3px 0 rgba(15, 23, 42, 0.16);
+      box-shadow: 0 2.5px 0 rgba(15, 23, 42, 0.16);
       transition: transform 0.08s ease;
     }
 
@@ -557,13 +557,13 @@
     }
 
     body.mode-puzzle .sidebar-pane {
-      gap: 5px;
-      padding: 6px 10px;
+      gap: 4px;
+      padding: 5px 9px;
     }
 
     body.mode-puzzle .op-btn {
-      min-height: 33px;
-      padding: 4px 4px;
+      min-height: 28px;
+      padding: 2px 4px;
     }
 
     body.mode-puzzle .hud-number-card {
@@ -925,10 +925,14 @@
           <button class="op-btn btn-sub" data-op="sub" data-val="3">- 3</button>
           <button class="op-btn btn-add" data-op="add" data-val="5">+ 5</button>
           <button class="op-btn btn-sub" data-op="sub" data-val="5">- 5</button>
+          <button class="op-btn btn-add" data-op="add" data-val="10">+ 10</button>
+          <button class="op-btn btn-sub" data-op="sub" data-val="10">- 10</button>
           <button class="op-btn btn-add" data-op="add" data-val="100">+ 100</button>
           <button class="op-btn btn-sub" data-op="sub" data-val="100">- 100</button>
           <button class="op-btn btn-add" data-op="add" data-val="1000">+ 1.000</button>
           <button class="op-btn btn-sub" data-op="sub" data-val="1000">- 1.000</button>
+          <button class="op-btn btn-add" data-op="add" data-val="10000">+ 10.000</button>
+          <button class="op-btn btn-sub" data-op="sub" data-val="10000">- 10.000</button>
         </div>
       </section>
 
@@ -948,6 +952,8 @@
           <button class="op-btn btn-div" data-op="div" data-val="7">&divide; 7</button>
           <button class="op-btn btn-mul" data-op="mul" data-val="10">&times; 10</button>
           <button class="op-btn btn-div" data-op="div" data-val="10">&divide; 10</button>
+          <button class="op-btn btn-mul" data-op="mul" data-val="100">&times; 100</button>
+          <button class="op-btn btn-div" data-op="div" data-val="100">&divide; 100</button>
         </div>
       </section>
 
@@ -1283,10 +1289,14 @@
         { op: 'sub', val: 3n, label: '- 3' },
         { op: 'add', val: 5n, label: '+ 5' },
         { op: 'sub', val: 5n, label: '- 5' },
+        { op: 'add', val: 10n, label: '+ 10' },
+        { op: 'sub', val: 10n, label: '- 10' },
         { op: 'add', val: 100n, label: '+ 100' },
         { op: 'sub', val: 100n, label: '- 100' },
         { op: 'add', val: 1000n, label: '+ 1.000' },
         { op: 'sub', val: 1000n, label: '- 1.000' },
+        { op: 'add', val: 10000n, label: '+ 10.000' },
+        { op: 'sub', val: 10000n, label: '- 10.000' },
         { op: 'mul', val: 2n, label: '× 2' },
         { op: 'div', val: 2n, label: '÷ 2' },
         { op: 'mul', val: 3n, label: '× 3' },
@@ -1296,7 +1306,9 @@
         { op: 'mul', val: 7n, label: '× 7' },
         { op: 'div', val: 7n, label: '÷ 7' },
         { op: 'mul', val: 10n, label: '× 10' },
-        { op: 'div', val: 10n, label: '÷ 10' }
+        { op: 'div', val: 10n, label: '÷ 10' },
+        { op: 'mul', val: 100n, label: '× 100' },
+        { op: 'div', val: 100n, label: '÷ 100' }
       ];
 
       function applyOpBigInt(cur, op, val) {
@@ -1334,7 +1346,7 @@
             const candidates = [];
             for (const entry of PUZZLE_OPS) {
               // Keep 'easy' numbers friendly for 8-year-olds when starting small
-              if (difficulty === 'easy' && cur < 100n && (entry.val === 100n || entry.val === 1000n)) {
+              if (difficulty === 'easy' && cur < 100n && entry.val >= 100n) {
                 continue;
               }
               const next = applyOpBigInt(cur, entry.op, entry.val);
@@ -1389,7 +1401,7 @@
         let fQueue = [curVal];
         let bQueue = [targetVal];
         let totalVisited = 2;
-        const MAX_STATES = 16000;
+        const MAX_STATES = 25000;
 
         function extractFirstForwardStep(meetKey) {
           if (meetKey === startKey) {
